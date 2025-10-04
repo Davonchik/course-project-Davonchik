@@ -1,16 +1,54 @@
 # Python
-__pycache__/
-*.py[cod]
-*.so
 *.egg-info/
 dist/
 build/
-.venv/
-.env
+
+# IDE
+.idea/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# C extensions
+*.c
+
+# Test cache
 .pytest_cache/
 .coverage
-# IDE
+.cache/
+.tox/
+htmlcov/
+
+# mypy / ruff / pylint / etc
+.mypy_cache/
+.ruff_cache/
+
+# Env
+.env
+.env.local
+.env.development
+.env.production
+
+# SQLite database
+*.sqlite3
+app.db
+
+# VS Code
 .vscode/
-.idea/
-# OS
+
+# Poetry
+.poetry/
+poetry.lock
+
+# Virtualenvs
+.venv/
+venv/
+ENV/
+
+# macOS / Linux / Windows system files
 .DS_Store
+Thumbs.db

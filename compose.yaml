@@ -1,8 +1,54 @@
+version: "3.9"
+
 services:
+  db:
+    image: postgres:16
+    restart: always
+    environment:
+      POSTGRES_DB: reading_list
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d reading_list"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
   app:
     build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://postgres:postgres@db:5432/reading_list}
     ports:
       - "8000:8000"
+    command: >
+      uvicorn app.main:app --host 0.0.0.0 --port 8000
+    # Для live-reload можно так:
+    # command: >
+    #   bash -lc "pip install -e . && uvicorn src.app.main:app --host 0.0.0.0 --port 8000 --reload"
+    # volumes:
+    #   - ./:/app
+  reading-list-frontend:
+    build: reading_list_frontend
+    ports:
+      - "3000:80"
     environment:
-      - PYTHONUNBUFFERED=1
-    profiles: ["dev"]
+      - REACT_APP_API_URL=http://localhost:8000
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  pgdata:
