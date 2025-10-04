@@ -54,37 +54,34 @@ async def test_logout_blacklists_access_and_refresh_and_revokes_device(
     req = _mk_request_with_headers({"authorization": f"Bearer {access}"})
     req.state.user = {"id": user.id, "claims": {"role": "user"}}
 
-    # действие
     await logout(
         req, LogoutIn(device_id=device_id, refresh_token=refresh), session=session
     )
 
-    # --- Проверки (артефакты) ---
+    # refresh для девайса отозван
+    q1 = await session.execute(
+        select(RefreshToken).where(RefreshToken.jti == rc["jti"])
+    )
+    assert q1.scalar_one().revoked is True
 
-    # 1) access занесён в блэклист
+    # access в блэклисте
     ac_claims = decode_token(access)
-    q_access_bl = await session.execute(
+    q2 = await session.execute(
         select(RevokedToken).where(
             RevokedToken.jti == ac_claims["jti"],
             RevokedToken.token_type == "access",
         )
     )
-    assert q_access_bl.scalar_one_or_none() is not None
+    assert q2.scalar_one_or_none() is not None
 
-    # 2) refresh занесён в блэклист
-    q_refresh_bl = await session.execute(
+    # refresh тоже в блэклисте
+    q3 = await session.execute(
         select(RevokedToken).where(
             RevokedToken.jti == rc["jti"],
             RevokedToken.token_type == "refresh",
         )
     )
-    assert q_refresh_bl.scalar_one_or_none() is not None
-
-    # (Опционально) можно убедиться, что запись refresh существует в принципе
-    q_refresh_row = await session.execute(
-        select(RefreshToken).where(RefreshToken.jti == rc["jti"])
-    )
-    assert q_refresh_row.scalar_one_or_none() is not None
+    assert q3.scalar_one_or_none() is not None
 
 
 async def test_logout_without_auth_header_only_revokes_refreshes_for_device(
@@ -113,20 +110,17 @@ async def test_logout_without_auth_header_only_revokes_refreshes_for_device(
         req, LogoutIn(device_id=device_id, refresh_token=refresh), session=session
     )
 
-    # refresh добавлен в блэклист
-    q_refresh_bl = await session.execute(
-        select(RevokedToken).where(
-            RevokedToken.jti == rc["jti"],
-            RevokedToken.token_type == "refresh",
-        )
+    # refresh отозван
+    q1 = await session.execute(
+        select(RefreshToken).where(RefreshToken.jti == rc["jti"])
     )
-    assert q_refresh_bl.scalar_one_or_none() is not None
+    assert q1.scalar_one().revoked is True
 
-    # access в блэклист НЕ добавлен (не было заголовка Authorization)
-    q_access_any = await session.execute(
+    # access в блэклист не добавлен
+    q2 = await session.execute(
         select(RevokedToken).where(RevokedToken.token_type == "access")
     )
-    assert q_access_any.scalar_one_or_none() is None
+    assert q2.scalar_one_or_none() is None
 
 
 async def test_logout_with_invalid_access_token_is_ignored(

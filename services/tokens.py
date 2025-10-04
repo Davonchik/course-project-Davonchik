@@ -35,7 +35,7 @@ async def create_refresh_record(
 async def revoke_refresh_by_jti(session: AsyncSession, jti: str) -> None:
     await session.execute(
         update(RefreshToken)
-        .where(RefreshToken.jti == jti, not RefreshToken.revoked)
+        .where(RefreshToken.jti == jti, RefreshToken.revoked.is_(False))
         .values(revoked=True)
     )
     await session.commit()
@@ -49,7 +49,7 @@ async def revoke_refresh_for_device(
         .where(
             RefreshToken.user_id == user_id,
             RefreshToken.device_id == device_id,
-            not RefreshToken.revoked,
+            RefreshToken.revoked.is_(False),
         )
         .values(revoked=True)
     )
