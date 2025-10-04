@@ -6,7 +6,7 @@ from sqlalchemy.orm import DeclarativeBase
 
 load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL = os.getenv("DATABASE_URL") or "sqlite+aiosqlite:///./ci.db"
 
 engine = create_async_engine(DATABASE_URL, echo=True)
 
