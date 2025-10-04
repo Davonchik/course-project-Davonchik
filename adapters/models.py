@@ -1,3 +1,5 @@
+# isort: skip_file
+# ruff: noqa: I001,I002,I003,I004,I005
 from datetime import datetime, timezone
 
 from sqlalchemy import (
