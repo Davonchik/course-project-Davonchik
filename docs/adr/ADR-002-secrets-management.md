@@ -34,6 +34,7 @@
 
 ## Links
 - NFR-07 (Секреты вне кода), NFR-09 (TLS perimetr)
+- DFD Flows: F9 (load secrets)
 - STRIDE/RISKS: R3
 - Код: `config.py`, `adapters/security.py`
-- Тесты: интеграционные тесты auth/login/refresh (`tests/test_login.py`, `tests/test_refresh.py`) косвенно подтверждают корректную подпись/issuer.
+- Тесты: интеграционные тесты auth/login/refresh (`tests/test_login.py`, `tests/test_refresh.py`) подтверждают корректную подпись/issuer.

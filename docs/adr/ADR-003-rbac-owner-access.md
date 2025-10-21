@@ -35,6 +35,7 @@
 
 ## Links
 - NFR-05 (Авторизация по ролям), NFR-08 (Приватность моделей)
+- DFD Flows: F5 (entries with Bearer), F6 (update entries), F10 (admin), F10b (list users)
 - STRIDE/RISKS: R4, R10, R12
 - Код: `app/middleware.py`, `app/routers/admin.py`, `services/entries.py`, `domain/schemas.py`
 - Тесты: `tests/test_entries.py` (own-only, admin filters), `tests/test_admin.py`
