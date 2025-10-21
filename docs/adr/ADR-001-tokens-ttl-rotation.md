@@ -37,8 +37,8 @@
 - Rollout: фича уже включена. Для продакшна — добавить фоновую чистку устаревших записей и мониторинг попыток reuse (по `RevokedToken`).
 
 ## Links
-- NFR-03 (TTL токенов), NFR-04 (ротация refresh), NFR-06 (унификация ошибок аутентификации)
+- NFR-03 (TTL токенов), NFR-04 (ротация refresh), NFR-06 (унификация ошибок аутентификации), NFR-07 (секреты из env/CI)
 - DFD Flows: F2 (login), F4 (persist refresh), F5 (protected endpoints, Bearer), F7 (refresh), F7b (rotate refresh), F8 (logout), F8b (blacklist)
 - STRIDE/RISKS: R2, R11
 - Код: `adapters/security.py`, `services/tokens.py`, `app/middleware.py`, `app/routers/auth.py`
-- Тесты: `tests/test_refresh.py`, `tests/test_logout.py`, `tests/test_login.py`
+- Тесты: `tests/test_refresh.py`, `tests/test_logout.py`, `tests/test_login.py`, `tests/test_tokens.py`, `tests/test_auth.py`
