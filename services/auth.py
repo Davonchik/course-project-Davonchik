@@ -22,7 +22,6 @@ async def register_user(
     user = User(
         email=email, hashed_password=hash_password(password), role=role, is_active=True
     )
-    print("___________--------")
     session.add(user)
     await session.commit()
     await session.refresh(user)

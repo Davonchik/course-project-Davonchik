@@ -38,7 +38,6 @@ async def list_entries_ep(
     session: AsyncSession = Depends(get_session),
     _=Depends(oauth2_scheme),
 ):
-    print(req.state.user)
     if req.state.user["claims"]["role"] == "admin":
         items = await list_entries_admin(session, entry_status, limit, offset, owner_id)
     else:
