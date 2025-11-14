@@ -334,6 +334,14 @@ jobs:
   # ============================================================================
   # Summary Job
   # ============================================================================
+  # Alias job для branch protection (если требуется "build" check)
+  build:
+    runs-on: ubuntu-latest
+    needs: [docker-build-and-scan]
+    steps:
+      - name: Build completed
+        run: echo "✅ Docker image built and scanned successfully"
+
   ci-success:
     runs-on: ubuntu-latest
     needs: [lint-and-test, hadolint, docker-build-and-scan, container-tests, image-analysis]
