@@ -67,7 +67,7 @@ jobs:
 
       - name: Tests with coverage
         run: |
-          pytest -q --cov=services --cov=adapters --cov=domain --cov-branch --cov-report=term-missing --cov-report=xml --cov-fail-under=80 --junitxml=reports/junit.xml
+          pytest -q --cov=services --cov=adapters --cov=domain --cov-branch --cov-report=term-missing --cov-report=xml --cov-fail-under=80 --junitxml=junit.xml
 
       - name: Upload test reports
         if: always()
@@ -76,7 +76,7 @@ jobs:
           name: test-reports-${{ matrix.python-version }}
           path: |
             coverage.xml
-            reports/junit.xml
+            junit.xml
           retention-days: 30
 
       - name: Pre-commit (all files)
@@ -232,17 +232,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Validate docker-compose.yml
-        run: docker compose config --quiet
-
       - name: Create .env file
         run: |
           cat > .env << EOF
           DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/reading_list
-          JWT_SECRET_KEY=test-secret-key-for-ci-only
-          ADMIN_JWT_SECRET_KEY=test-admin-secret-key-for-ci
+          JWT_SECRET=test-secret-key-for-ci-min-32-chars-long
           LOG_LEVEL=INFO
           EOF
+
+      - name: Validate docker-compose.yml
+        run: docker compose config --quiet
 
       - name: Start services with docker-compose
         run: docker compose up -d --wait  # образ уже собран в docker-build-and-scan

@@ -23,9 +23,7 @@ __pycache__/
 .tox/
 htmlcov/
 coverage.xml
-reports/*.xml
-reports/*.json
-!reports/.gitkeep
+junit.xml
 
 # Security scan reports
 bandit.json
