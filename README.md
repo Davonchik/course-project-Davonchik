@@ -24,6 +24,8 @@ docker compose up -d --build
 ```
 подымет БД, [Бэкенд](http://localhost:8000/docs) и [Фронт](http://localhost:3000/login)
 
+чтобы накатить миграцию, нужно сначала поднять контейнеры с помощью команды выше, а дальше ввести команду: `docker compose exec app alembic upgrade head`
+
 ## Ритуал перед PR
 ```bash
 ruff check --fix .

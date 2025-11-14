@@ -15,3 +15,16 @@ build/
 htmlcov/
 node_modules/
 .env
+
+# Не копируем фронтенд в бэкенд образ
+reading_list_frontend/
+
+# Документация и CI не нужны в образе
+.github/
+docs/
+*.md
+
+# Reports
+reports/
+bandit.json
+coverage.xml

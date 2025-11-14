@@ -1,23 +1,38 @@
 name: CI
+
 on:
   pull_request:
   push:
     branches: [main]
+
 permissions:
   contents: read
+  security-events: write  # для Trivy SARIF upload
+
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  build:
+  # ============================================================================
+  # Lint & Test Python Code
+  # ============================================================================
+  lint-and-test:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
 
-      - uses: actions/setup-python@v5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: ${{ matrix.python-version }}
           cache: "pip"
 
       - name: Install dependencies
@@ -39,11 +54,298 @@ jobs:
       - name: Security scan (bandit)
         run: |
           pip install bandit
+          bandit -r app services adapters -ll -f json -o bandit.json || true
           bandit -r app services adapters -ll -f txt || true
+
+      - name: Upload Bandit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bandit-${{ matrix.python-version }}
+          path: bandit.json
+          retention-days: 30
 
       - name: Tests with coverage
         run: |
-          pytest -q --cov=services --cov=adapters --cov=domain --cov-branch --cov-report=term-missing --cov-report=xml --cov-fail-under=80
+          pytest -q --cov=services --cov=adapters --cov=domain --cov-branch --cov-report=term-missing --cov-report=xml --cov-fail-under=80 --junitxml=reports/junit.xml
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports-${{ matrix.python-version }}
+          path: |
+            coverage.xml
+            reports/junit.xml
+          retention-days: 30
 
       - name: Pre-commit (all files)
+        if: ${{ matrix.python-version == '3.12' }}  # только на одной версии Python
         run: pre-commit run --all-files
+
+  # ============================================================================
+  # Dockerfile Linting with Hadolint
+  # ============================================================================
+  hadolint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Hadolint (Dockerfile linting)
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile
+          config: .hadolint.yaml
+          no-fail: false
+          format: github-action  # красивые аннотации в Actions
+
+      - name: Hadolint (Frontend Dockerfile)
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: reading_list_frontend/Dockerfile
+          no-fail: true  # фронтенд не блокируем, но проверяем
+          format: github-action
+        continue-on-error: true
+
+      - name: Hadolint report (JSON for artifacts)
+        if: always()
+        run: |
+          docker run --rm -i \
+            -v $(pwd)/.hadolint.yaml:/.config/hadolint.yaml \
+            hadolint/hadolint:latest-alpine hadolint \
+            --config /.config/hadolint.yaml \
+            --format json \
+            - < Dockerfile > hadolint-backend.json || true
+          docker run --rm -i \
+            hadolint/hadolint:latest-alpine hadolint \
+            --format json \
+            - < reading_list_frontend/Dockerfile > hadolint-frontend.json || true
+
+      - name: Upload Hadolint reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hadolint-reports
+          path: |
+            hadolint-backend.json
+            hadolint-frontend.json
+          retention-days: 30
+
+  # ============================================================================
+  # Docker Build & Security Scanning
+  # ============================================================================
+  docker-build-and-scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: [hadolint]  # запускаем только после линтинга Dockerfile
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          load: true
+          tags: |
+            reading-list-api:${{ github.sha }}
+            reading-list-api:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Trivy vulnerability scanner (Table output)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: reading-list-api:${{ github.sha }}
+          format: table
+          exit-code: 0  # не фейлим на этом шаге (показываем отчёт)
+          severity: CRITICAL,HIGH,MEDIUM
+
+      - name: Trivy vulnerability scanner (SARIF for GitHub Security)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: reading-list-api:${{ github.sha }}
+          format: sarif
+          output: trivy-results.sarif
+          severity: CRITICAL,HIGH
+          exit-code: 0
+
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: trivy-results.sarif
+
+      - name: Trivy scan (fail on CRITICAL vulnerabilities)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: reading-list-api:${{ github.sha }}
+          format: json
+          output: trivy-critical.json
+          exit-code: 1  # фейлим CI только на CRITICAL
+          severity: CRITICAL
+
+      - name: Generate SBOM (CycloneDX)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: reading-list-api:${{ github.sha }}
+          format: cyclonedx
+          output: sbom.cdx.json
+          exit-code: 0
+
+      - name: Upload SBOM
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-cyclonedx
+          path: sbom.cdx.json
+          retention-days: 30
+
+      - name: Upload Trivy scan results as artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trivy-scan-results
+          path: |
+            trivy-results.sarif
+            trivy-critical.json
+          retention-days: 30
+
+  # ============================================================================
+  # Container Runtime Tests
+  # ============================================================================
+  container-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [docker-build-and-scan]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate docker-compose.yml
+        run: docker compose config --quiet
+
+      - name: Create .env file
+        run: |
+          cat > .env << EOF
+          DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/reading_list
+          JWT_SECRET_KEY=test-secret-key-for-ci-only
+          ADMIN_JWT_SECRET_KEY=test-admin-secret-key-for-ci
+          LOG_LEVEL=INFO
+          EOF
+
+      - name: Start services with docker-compose
+        run: docker compose up -d --wait  # образ уже собран в docker-build-and-scan
+
+      - name: Check running containers
+        run: docker compose ps
+
+      - name: Wait for app to be healthy
+        run: |
+          timeout 60 bash -c 'until curl -f http://localhost:8000/health; do sleep 2; done'
+
+      - name: Test health endpoint
+        run: |
+          curl -f http://localhost:8000/health
+          curl -s http://localhost:8000/health | grep -q "healthy"
+
+      - name: Verify non-root user in container
+        run: |
+          USER_ID=$(docker compose exec -T app id -u)
+          echo "Container user ID: $USER_ID"
+          if [ "$USER_ID" = "0" ]; then
+            echo "ERROR: Container running as root!"
+            exit 1
+          fi
+          echo "✓ Container running as non-root user (UID: $USER_ID)"
+
+      - name: Verify read-only root filesystem
+        run: |
+          if docker compose exec -T app sh -c "grep -E ' / .*,ro[, ]' /proc/mounts >/dev/null"; then
+            echo "✓ Root filesystem is read-only"
+          else
+            echo "ERROR: root filesystem is not mounted read-only"
+            exit 1
+          fi
+
+      - name: Check container security settings
+        run: |
+          # Установка jq если отсутствует
+          command -v jq >/dev/null 2>&1 || (sudo apt-get update && sudo apt-get install -y jq)
+          docker inspect reading-list-api:latest | jq '.[0].Config.User'
+          docker compose exec -T app whoami || true
+
+      - name: Show container logs (if failed)
+        if: failure()
+        run: docker compose logs
+
+      - name: Cleanup
+        if: always()
+        run: docker compose down -v
+
+  # ============================================================================
+  # Docker Image Analysis
+  # ============================================================================
+  image-analysis:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [docker-build-and-scan]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build image for analysis
+        run: docker build -t reading-list-api:analysis .
+
+      - name: Docker history (layer size analysis)
+        run: docker history reading-list-api:analysis
+
+      - name: Docker image size
+        run: |
+          SIZE=$(docker images reading-list-api:analysis --format "{{.Size}}")
+          echo "Image size: $SIZE"
+          docker images reading-list-api:analysis
+
+      - name: Generate size report
+        run: |
+          FROM_COUNT=$(grep -c '^FROM ' Dockerfile || echo 1)
+          MS=$([ "$FROM_COUNT" -gt 1 ] && echo "Multi-stage" || echo "Single-stage")
+          echo "## Docker Image Size Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Image Size | $(docker images reading-list-api:analysis --format '{{.Size}}') |" >> $GITHUB_STEP_SUMMARY
+          echo "| Base Image | python:3.12-slim |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build Type | $MS ($FROM_COUNT stages) |" >> $GITHUB_STEP_SUMMARY
+
+  # ============================================================================
+  # Summary Job
+  # ============================================================================
+  ci-success:
+    runs-on: ubuntu-latest
+    needs: [lint-and-test, hadolint, docker-build-and-scan, container-tests, image-analysis]
+    if: always()
+
+    steps:
+      - name: Check all jobs status
+        run: |
+          if [[ "${{ needs.lint-and-test.result }}" != "success" ]] || \
+             [[ "${{ needs.hadolint.result }}" != "success" ]] || \
+             [[ "${{ needs.docker-build-and-scan.result }}" != "success" ]] || \
+             [[ "${{ needs.container-tests.result }}" != "success" ]] || \
+             [[ "${{ needs.image-analysis.result }}" != "success" ]]; then
+            echo "❌ One or more jobs failed"
+            exit 1
+          fi
+          echo "✅ All CI checks passed!"

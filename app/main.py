@@ -50,3 +50,9 @@ app.add_exception_handler(Exception, generic_exc_handler)
 app.include_router(auth_router.router)
 app.include_router(entries_router.router)
 app.include_router(admin_router.router)
+
+
+@app.get("/health")
+async def health_check():
+    """Health check endpoint for container orchestration"""
+    return {"status": "healthy", "service": "reading-list-api"}

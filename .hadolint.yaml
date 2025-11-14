@@ -1,0 +1,31 @@
+# .hadolint.yaml
+
+# Документация по конфигу и override:
+# - override/ignored/trustedRegistries поддерживаются
+# - no-fail / no-color = флаги CLI/Action, не ключи YAML
+
+ignored:
+  - DL3013  # pin версий в pip: используем requirements.txt c пинами
+  - DL3008  # pin версий в apt-get: используем latest для гибкости
+  - SC2086  # кавычки/глоббинг: осознанно контролируем в RUN
+
+trustedRegistries:
+  - docker.io
+  - ghcr.io
+  - gcr.io
+
+# Билд должен падать при "warning" и выше (можешь ужесточить до error)
+failure-threshold: warning
+
+# Повышаем важность правил, критичных для твоего Dockerfile
+override:
+  error:
+    - DL3002  # последний USER не должен быть root
+    - DL3025  # CMD/ENTRYPOINT в JSON-формате
+    - DL3007  # не использовать :latest
+    - DL4006  # SHELL -o pipefail (если используется SHELL)
+  warning:
+    - DL3009  # удалить apt-lists после установки
+    - DL3015  # лишние пакеты в apt-get
+  info:
+    - DL3045  # предпочитай COPY вместо ADD
