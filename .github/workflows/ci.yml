@@ -258,6 +258,10 @@ jobs:
           curl -f http://localhost:8000/health
           curl -s http://localhost:8000/health | grep -q "healthy"
 
+      - name: Install jq for security checks
+        run: |
+          command -v jq >/dev/null 2>&1 || (sudo apt-get update && sudo apt-get install -y jq)
+
       - name: Verify non-root user in container
         run: |
           USER_ID=$(docker compose exec -T app id -u)
@@ -270,17 +274,16 @@ jobs:
 
       - name: Verify read-only root filesystem
         run: |
-          if docker compose exec -T app sh -c "grep -E ' / .*,ro[, ]' /proc/mounts >/dev/null"; then
+          READONLY=$(docker inspect $(docker compose ps -q app) | jq -r '.[0].HostConfig.ReadonlyRootfs')
+          if [ "$READONLY" = "true" ]; then
             echo "✓ Root filesystem is read-only"
           else
-            echo "ERROR: root filesystem is not mounted read-only"
+            echo "ERROR: ReadonlyRootfs is not enabled (got: $READONLY)"
             exit 1
           fi
 
       - name: Check container security settings
         run: |
-          # Установка jq если отсутствует
-          command -v jq >/dev/null 2>&1 || (sudo apt-get update && sudo apt-get install -y jq)
           docker inspect reading-list-api:latest | jq '.[0].Config.User'
           docker compose exec -T app whoami || true
 
