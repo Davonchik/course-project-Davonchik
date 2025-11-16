@@ -22,6 +22,11 @@ __pycache__/
 .cache/
 .tox/
 htmlcov/
+coverage.xml
+junit.xml
+
+# Security scan reports
+bandit.json
 
 # mypy / ruff / pylint / etc
 .mypy_cache/
