@@ -33,7 +33,15 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          cache: "pip"
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements*.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-${{ matrix.python-version }}-
+            ${{ runner.os }}-pip-
 
       - name: Install dependencies
         run: |
@@ -233,10 +241,13 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Create .env file
+        env:
+          JWT_SECRET: ${{ secrets.JWT_SECRET || 'test-secret-key-for-ci-min-32-chars-long' }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql+asyncpg://postgres:postgres@db:5432/reading_list' }}
         run: |
           cat > .env << EOF
-          DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/reading_list
-          JWT_SECRET=test-secret-key-for-ci-min-32-chars-long
+          DATABASE_URL=${{ env.DATABASE_URL }}
+          JWT_SECRET=${{ env.JWT_SECRET }}
           LOG_LEVEL=INFO
           EOF
 
@@ -332,6 +343,94 @@ jobs:
           echo "| Build Type | $MS ($FROM_COUNT stages) |" >> $GITHUB_STEP_SUMMARY
 
   # ============================================================================
+  # CD: Deploy to Staging (Mock/Emulation)
+  # ============================================================================
+  deploy-staging:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [lint-and-test, docker-build-and-scan, container-tests]
+    if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request'
+    environment:
+      name: staging
+      url: https://staging.reading-list.example.com
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Simulate deployment preparation
+        run: |
+          echo "Preparing deployment to staging environment..."
+          echo "Image tag: ${{ github.sha }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Event: ${{ github.event_name }}"
+
+      - name: Mock kubectl apply (dry-run)
+        run: |
+          echo "Simulating Kubernetes deployment..."
+          cat > deployment-staging.yaml << EOF
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: reading-list-api
+            namespace: staging
+          spec:
+            replicas: 2
+            selector:
+              matchLabels:
+                app: reading-list-api
+            template:
+              metadata:
+                labels:
+                  app: reading-list-api
+              spec:
+                containers:
+                - name: api
+                  image: reading-list-api:${{ github.sha }}
+                  ports:
+                  - containerPort: 8000
+                  env:
+                  - name: DATABASE_URL
+                    valueFrom:
+                      secretKeyRef:
+                        name: reading-list-secrets
+                        key: database-url
+                  - name: JWT_SECRET
+                    valueFrom:
+                      secretKeyRef:
+                        name: reading-list-secrets
+                        key: jwt-secret
+          EOF
+          echo "Deployment manifest generated"
+          cat deployment-staging.yaml
+
+      - name: Upload deployment manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-manifest-${{ github.sha }}
+          path: deployment-staging.yaml
+          retention-days: 7
+
+      - name: Simulate deployment execution
+        run: |
+          echo "Deploying to staging namespace..."
+          echo "kubectl apply -f deployment-staging.yaml --dry-run=client"
+          echo "Dry-run successful!"
+
+      - name: Deployment summary
+        run: |
+          echo "## Staging Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Environment | staging |" >> $GITHUB_STEP_SUMMARY
+          echo "| Image Tag | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Branch | \`${{ github.ref_name }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Deployment Mode | dry-run/mock |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployment simulation completed successfully**" >> $GITHUB_STEP_SUMMARY
+
+  # ============================================================================
   # Summary Job
   # ============================================================================
   # Alias job для branch protection (если требуется "build" check)
@@ -344,7 +443,7 @@ jobs:
 
   ci-success:
     runs-on: ubuntu-latest
-    needs: [lint-and-test, hadolint, docker-build-and-scan, container-tests, image-analysis]
+    needs: [lint-and-test, hadolint, docker-build-and-scan, container-tests, image-analysis, deploy-staging]
     if: always()
 
     steps:
@@ -354,8 +453,9 @@ jobs:
              [[ "${{ needs.hadolint.result }}" != "success" ]] || \
              [[ "${{ needs.docker-build-and-scan.result }}" != "success" ]] || \
              [[ "${{ needs.container-tests.result }}" != "success" ]] || \
-             [[ "${{ needs.image-analysis.result }}" != "success" ]]; then
+             [[ "${{ needs.image-analysis.result }}" != "success" ]] || \
+             [[ "${{ needs.deploy-staging.result }}" != "success" ]]; then
             echo "❌ One or more jobs failed"
             exit 1
           fi
-          echo "✅ All CI checks passed!"
+          echo "✅ All CI/CD checks passed!"
