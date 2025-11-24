@@ -9,6 +9,13 @@ on:
       - "reading_list_frontend/package.json"
       - "reading_list_frontend/package-lock.json"
       - ".github/workflows/ci-sbom-sca.yml"
+  pull_request:
+    paths:
+      - "**/*.py"
+      - "requirements*.txt"
+      - "reading_list_frontend/package.json"
+      - "reading_list_frontend/package-lock.json"
+      - ".github/workflows/ci-sbom-sca.yml"
 
 permissions:
   contents: read
@@ -32,14 +39,62 @@ jobs:
       - name: Generate SBOM for Python dependencies (Syft CycloneDX)
         id: sbom
         run: |
-          docker run --rm -v $PWD:/work -w /work anchore/syft:latest \
+          # Фиксируем версию Syft для воспроизводимости
+          docker run --rm -v $PWD:/work -w /work anchore/syft:v0.102.0 \
             packages dir:. -o cyclonedx-json > EVIDENCE/P09/sbom.json
 
       - name: SCA Scan (Grype)
         run: |
           set -e
-          docker run --rm -v $PWD:/work -w /work anchore/grype:latest \
+          # Фиксируем версию Grype для воспроизводимости
+          docker run --rm -v $PWD:/work -w /work anchore/grype:v0.75.0 \
             sbom:/work/EVIDENCE/P09/sbom.json -o json > EVIDENCE/P09/sca_report.json || true
+
+      - name: Apply waivers (filter SCA report)
+        run: |
+          python - <<'PY'
+          import json, sys, pathlib
+          from datetime import datetime
+
+          try:
+              import yaml
+          except ImportError:
+              import subprocess; subprocess.check_call([sys.executable, "-m", "pip", "install", "PyYAML"])
+              import yaml
+
+          sca = pathlib.Path("EVIDENCE/P09/sca_report.json")
+          wa = pathlib.Path("policy/waivers.yml")
+          out_filtered = pathlib.Path("EVIDENCE/P09/sca_report.filtered.json")
+          out_waived   = pathlib.Path("EVIDENCE/P09/sca_report.waived.json")
+
+          data = json.loads(sca.read_text()) if sca.exists() else {"matches": []}
+          waivers = yaml.safe_load(wa.read_text()) if wa.exists() else {}
+          waivers = waivers.get("waivers", []) or []
+
+          def waived(m):
+              v = m.get("vulnerability", {})
+              a = m.get("artifact", {})
+              for w in waivers:
+                  if w.get("id")==v.get("id") and w.get("package")==a.get("name") and w.get("version")==a.get("version"):
+                      exp = w.get("expires_at")
+                      if exp:
+                          try:
+                              if datetime.utcnow() > datetime.fromisoformat(exp):
+                                  continue
+                          except Exception:
+                              pass
+                      return True
+              return False
+
+          kept, dropped = [], []
+          for m in data.get("matches", []):
+              (dropped if waived(m) else kept).append(m)
+
+          data["matches"] = kept
+          out_filtered.write_text(json.dumps(data, ensure_ascii=False, indent=2))
+          out_waived.write_text(json.dumps({"waived": dropped}, ensure_ascii=False, indent=2))
+          print(f"Kept: {len(kept)}, Waived: {len(dropped)}")
+          PY
 
       - name: Install jq
         run: |
@@ -57,21 +112,25 @@ jobs:
           echo "**Branch:** \`${{ github.ref_name }}\`" >> EVIDENCE/P09/sca_summary.md
           echo "" >> EVIDENCE/P09/sca_summary.md
 
-          if [ -f EVIDENCE/P09/sca_report.json ]; then
-            # Подсчет по severity
-            echo "## Vulnerability Summary by Severity" >> EVIDENCE/P09/sca_summary.md
-            echo "" >> EVIDENCE/P09/sca_summary.md
-            echo "| Severity | Count |" >> EVIDENCE/P09/sca_summary.md
-            echo "|----------|-------|" >> EVIDENCE/P09/sca_summary.md
+          REPORT=EVIDENCE/P09/sca_report.filtered.json
+          [ -f "$REPORT" ] || REPORT=EVIDENCE/P09/sca_report.json
 
-            jq -r '[.matches[].vulnerability.severity] | group_by(.) | map({severity: .[0], count: length}) | .[] | "| \(.severity // "Unknown") | \(.count) |"' \
-              EVIDENCE/P09/sca_report.json >> EVIDENCE/P09/sca_summary.md 2>/dev/null || echo "| No vulnerabilities found | 0 |" >> EVIDENCE/P09/sca_summary.md
+          echo "## Vulnerability Summary by Severity" >> EVIDENCE/P09/sca_summary.md
+          echo "" >> EVIDENCE/P09/sca_summary.md
+          echo "| Severity | Count |" >> EVIDENCE/P09/sca_summary.md
+          echo "|----------|-------|" >> EVIDENCE/P09/sca_summary.md
+          jq -r '[.matches[].vulnerability.severity] | group_by(.) | map({severity: .[0], count: length}) | .[] | "| \(.severity // "Unknown") | \(.count) |"' \
+            "$REPORT" >> EVIDENCE/P09/sca_summary.md 2>/dev/null || echo "| No vulnerabilities found | 0 |" >> EVIDENCE/P09/sca_summary.md
 
-            echo "" >> EVIDENCE/P09/sca_summary.md
+          WAIVED_COUNT=$(jq -r '.waived | length' EVIDENCE/P09/sca_report.waived.json 2>/dev/null || echo "0")
+          echo "" >> EVIDENCE/P09/sca_summary.md
+          echo "**Waived findings:** ${WAIVED_COUNT}" >> EVIDENCE/P09/sca_summary.md
+          echo "" >> EVIDENCE/P09/sca_summary.md
 
+          if [ -f "$REPORT" ]; then
             # Подсчет Critical/High
-            CRITICAL_COUNT=$(jq '[.matches[] | select(.vulnerability.severity == "Critical")] | length' EVIDENCE/P09/sca_report.json 2>/dev/null || echo "0")
-            HIGH_COUNT=$(jq '[.matches[] | select(.vulnerability.severity == "High")] | length' EVIDENCE/P09/sca_report.json 2>/dev/null || echo "0")
+            CRITICAL_COUNT=$(jq '[.matches[] | select(.vulnerability.severity == "Critical")] | length' "$REPORT" 2>/dev/null || echo "0")
+            HIGH_COUNT=$(jq '[.matches[] | select(.vulnerability.severity == "High")] | length' "$REPORT" 2>/dev/null || echo "0")
 
             if [ "$CRITICAL_COUNT" -gt 0 ] || [ "$HIGH_COUNT" -gt 0 ]; then
               echo "## ⚠️ Critical/High Vulnerabilities" >> EVIDENCE/P09/sca_summary.md
@@ -83,7 +142,7 @@ jobs:
 
               jq -r '.matches[] | select(.vulnerability.severity == "High" or .vulnerability.severity == "Critical") |
                 "#### \(.vulnerability.id)\n- **Package**: `\(.artifact.name)@\(.artifact.version)`\n- **Severity**: \(.vulnerability.severity)\n- **Type**: \(.artifact.type)\n- **Description**: \(.vulnerability.description // "N/A" | split("\n") | .[0])\n- **Fixed in**: \(.vulnerability.fix.versions[]? // "No fix available")\n"' \
-                EVIDENCE/P09/sca_report.json | head -n 100 >> EVIDENCE/P09/sca_summary.md 2>/dev/null || echo "No High/Critical vulnerabilities found" >> EVIDENCE/P09/sca_summary.md
+                "$REPORT" | head -n 100 >> EVIDENCE/P09/sca_summary.md 2>/dev/null || echo "No High/Critical vulnerabilities found" >> EVIDENCE/P09/sca_summary.md
             else
               echo "## ✅ No Critical/High Vulnerabilities Found" >> EVIDENCE/P09/sca_summary.md
               echo "" >> EVIDENCE/P09/sca_summary.md
@@ -106,5 +165,30 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: P09_EVIDENCE
-          path: EVIDENCE/P09
+          path: |
+            EVIDENCE/P09/sbom.json
+            EVIDENCE/P09/sca_report.json
+            EVIDENCE/P09/sca_report.filtered.json
+            EVIDENCE/P09/sca_report.waived.json
+            EVIDENCE/P09/sca_summary.md
           retention-days: 90
+
+  commit-evidence:
+    needs: sbom_sca
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: P09_EVIDENCE
+          path: EVIDENCE/P09
+      - name: Commit evidence
+        run: |
+          git config user.email "action@github.com"
+          git config user.name "GitHub Action"
+          git add EVIDENCE/P09/
+          git diff --staged --quiet || git commit -m "chore: update SBOM & SCA evidence [skip ci]"
+          git push || echo "Nothing to push"
