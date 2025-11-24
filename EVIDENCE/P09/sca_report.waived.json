@@ -1,3 +1,236 @@
 {
-  "waived": []
+  "waived": [
+    {
+      "vulnerability": {
+        "id": "GHSA-5j98-mcp5-4vw2",
+        "dataSource": "https://github.com/advisories/GHSA-5j98-mcp5-4vw2",
+        "namespace": "github:language:javascript",
+        "severity": "High",
+        "urls": [
+          "https://github.com/advisories/GHSA-5j98-mcp5-4vw2"
+        ],
+        "description": "glob CLI: Command injection via -c/--cmd executes matches with shell:true",
+        "cvss": [
+          {
+            "version": "3.1",
+            "vector": "CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H",
+            "metrics": {
+              "baseScore": 7.5,
+              "exploitabilityScore": 1.6,
+              "impactScore": 5.9
+            },
+            "vendorMetadata": {
+              "base_severity": "High",
+              "status": "N/A"
+            }
+          }
+        ],
+        "fix": {
+          "versions": [
+            "10.5.0"
+          ],
+          "state": "fixed"
+        },
+        "advisories": []
+      },
+      "relatedVulnerabilities": [
+        {
+          "id": "CVE-2025-64756",
+          "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2025-64756",
+          "namespace": "nvd:cpe",
+          "severity": "High",
+          "urls": [
+            "https://github.com/isaacs/node-glob/commit/1e4e297342a09f2aa0ced87fcd4a70ddc325d75f",
+            "https://github.com/isaacs/node-glob/commit/47473c046b91c67269df7a66eab782a6c2716146",
+            "https://github.com/isaacs/node-glob/security/advisories/GHSA-5j98-mcp5-4vw2"
+          ],
+          "description": "Glob matches files using patterns the shell uses. Starting in version 10.2.0 and prior to versions 10.5.0 and 11.1.0, the glob CLI contains a command injection vulnerability in its -c/--cmd option that allows arbitrary command execution when processing files with malicious names. When glob -c <command> <patterns> are used, matched filenames are passed to a shell with shell: true, enabling shell metacharacters in filenames to trigger command injection and achieve arbitrary code execution under the user or CI account privileges. This issue has been patched in versions 10.5.0 and 11.1.0.",
+          "cvss": [
+            {
+              "source": "security-advisories@github.com",
+              "type": "Secondary",
+              "version": "3.1",
+              "vector": "CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H",
+              "metrics": {
+                "baseScore": 7.5,
+                "exploitabilityScore": 1.6,
+                "impactScore": 5.9
+              },
+              "vendorMetadata": {}
+            }
+          ]
+        }
+      ],
+      "matchDetails": [
+        {
+          "type": "exact-direct-match",
+          "matcher": "javascript-matcher",
+          "searchedBy": {
+            "language": "javascript",
+            "namespace": "github:language:javascript",
+            "package": {
+              "name": "glob",
+              "version": "10.4.5"
+            }
+          },
+          "found": {
+            "versionConstraint": ">=10.2.0,<10.5.0 (unknown)",
+            "vulnerabilityID": "GHSA-5j98-mcp5-4vw2"
+          }
+        }
+      ],
+      "artifact": {
+        "id": "efb0d4fd082e13e9",
+        "name": "glob",
+        "version": "10.4.5",
+        "type": "npm",
+        "locations": [
+          {
+            "path": "/reading_list_frontend/package-lock.json"
+          }
+        ],
+        "language": "javascript",
+        "licenses": [
+          "ISC"
+        ],
+        "cpes": [
+          "cpe:2.3:a:glob:glob:10.4.5:*:*:*:*:*:*:*"
+        ],
+        "purl": "pkg:npm/glob@10.4.5",
+        "upstreams": []
+      }
+    },
+    {
+      "vulnerability": {
+        "id": "GHSA-rp65-9cf3-cjxr",
+        "dataSource": "https://github.com/advisories/GHSA-rp65-9cf3-cjxr",
+        "namespace": "github:language:javascript",
+        "severity": "High",
+        "urls": [
+          "https://github.com/advisories/GHSA-rp65-9cf3-cjxr"
+        ],
+        "description": "Inefficient Regular Expression Complexity in nth-check",
+        "cvss": [
+          {
+            "version": "3.1",
+            "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+            "metrics": {
+              "baseScore": 7.5,
+              "exploitabilityScore": 3.9,
+              "impactScore": 3.6
+            },
+            "vendorMetadata": {
+              "base_severity": "High",
+              "status": "N/A"
+            }
+          }
+        ],
+        "fix": {
+          "versions": [
+            "2.0.1"
+          ],
+          "state": "fixed"
+        },
+        "advisories": []
+      },
+      "relatedVulnerabilities": [
+        {
+          "id": "CVE-2021-3803",
+          "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2021-3803",
+          "namespace": "nvd:cpe",
+          "severity": "High",
+          "urls": [
+            "https://github.com/fb55/nth-check/commit/9894c1d2010870c351f66c6f6efcf656e26bb726",
+            "https://huntr.dev/bounties/8cf8cc06-d2cf-4b4e-b42c-99fafb0b04d0",
+            "https://lists.debian.org/debian-lts-announce/2023/05/msg00023.html",
+            "https://github.com/fb55/nth-check/commit/9894c1d2010870c351f66c6f6efcf656e26bb726",
+            "https://huntr.dev/bounties/8cf8cc06-d2cf-4b4e-b42c-99fafb0b04d0",
+            "https://lists.debian.org/debian-lts-announce/2023/05/msg00023.html"
+          ],
+          "description": "nth-check is vulnerable to Inefficient Regular Expression Complexity",
+          "cvss": [
+            {
+              "source": "nvd@nist.gov",
+              "type": "Primary",
+              "version": "2.0",
+              "vector": "AV:N/AC:L/Au:N/C:N/I:N/A:P",
+              "metrics": {
+                "baseScore": 5,
+                "exploitabilityScore": 10,
+                "impactScore": 2.9
+              },
+              "vendorMetadata": {}
+            },
+            {
+              "source": "security@huntr.dev",
+              "type": "Secondary",
+              "version": "3.0",
+              "vector": "CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "metrics": {
+                "baseScore": 7.5,
+                "exploitabilityScore": 3.9,
+                "impactScore": 3.6
+              },
+              "vendorMetadata": {}
+            },
+            {
+              "source": "nvd@nist.gov",
+              "type": "Primary",
+              "version": "3.1",
+              "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "metrics": {
+                "baseScore": 7.5,
+                "exploitabilityScore": 3.9,
+                "impactScore": 3.6
+              },
+              "vendorMetadata": {}
+            }
+          ]
+        }
+      ],
+      "matchDetails": [
+        {
+          "type": "exact-direct-match",
+          "matcher": "javascript-matcher",
+          "searchedBy": {
+            "language": "javascript",
+            "namespace": "github:language:javascript",
+            "package": {
+              "name": "nth-check",
+              "version": "1.0.2"
+            }
+          },
+          "found": {
+            "versionConstraint": "<2.0.1 (unknown)",
+            "vulnerabilityID": "GHSA-rp65-9cf3-cjxr"
+          }
+        }
+      ],
+      "artifact": {
+        "id": "7dd5525f006da262",
+        "name": "nth-check",
+        "version": "1.0.2",
+        "type": "npm",
+        "locations": [
+          {
+            "path": "/reading_list_frontend/package-lock.json"
+          }
+        ],
+        "language": "javascript",
+        "licenses": [
+          "BSD-2-Clause"
+        ],
+        "cpes": [
+          "cpe:2.3:a:nth-check:nth-check:1.0.2:*:*:*:*:*:*:*",
+          "cpe:2.3:a:nth-check:nth_check:1.0.2:*:*:*:*:*:*:*",
+          "cpe:2.3:a:nth_check:nth-check:1.0.2:*:*:*:*:*:*:*",
+          "cpe:2.3:a:nth_check:nth_check:1.0.2:*:*:*:*:*:*:*",
+          "cpe:2.3:a:nth:nth-check:1.0.2:*:*:*:*:*:*:*",
+          "cpe:2.3:a:nth:nth_check:1.0.2:*:*:*:*:*:*:*"
+        ],
+        "purl": "pkg:npm/nth-check@1.0.2",
+        "upstreams": []
+      }
+    }
+  ]
 }

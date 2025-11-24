@@ -1,38 +1,19 @@
 # SCA Summary
 
-**Generated at:** 2025-11-24 17:25:27 UTC
-**Commit:** `8d06432f8748fe145df8b7e50100ab66d3cef31b`
-**Workflow Run:** [\#6](https://github.com/Davonchik/course-project-Davonchik/actions/runs/19643208216)
+**Generated at:** 2025-11-24 18:02:25 UTC
+**Commit:** `a040d424f0670f35df3b3f3b7d51123710baf9a3`
+**Workflow Run:** [\#10](https://github.com/Davonchik/course-project-Davonchik/actions/runs/19644226303)
 **Branch:** `p09-sbom-sca`
 
 ## Vulnerability Summary by Severity
 
 | Severity | Count |
 |----------|-------|
-| High | 2 |
 | Medium | 5 |
 
-**Waived findings:** 0
+**Waived findings:** 2
 
-## ⚠️ Critical/High Vulnerabilities
-
-**Critical:** 0 | **High:** 2
-
-### Top 10 Critical/High Findings
-
-#### GHSA-5j98-mcp5-4vw2
-- **Package**: `glob@10.4.5`
-- **Severity**: High
-- **Type**: npm
-- **Description**: glob CLI: Command injection via -c/--cmd executes matches with shell:true
-- **Fixed in**: 10.5.0
-
-#### GHSA-rp65-9cf3-cjxr
-- **Package**: `nth-check@1.0.2`
-- **Severity**: High
-- **Type**: npm
-- **Description**: Inefficient Regular Expression Complexity in nth-check
-- **Fixed in**: 2.0.1
+## ✅ No Critical/High Vulnerabilities Found
 
 
 ## Next Steps
