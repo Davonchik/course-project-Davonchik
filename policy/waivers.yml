@@ -1,27 +1,34 @@
 # policy/waivers.yml — файл исключений для SBOM & SCA
 # См. project/69_sbom-vuln-mgmt.md для описания политики.
 
-# Структура waiver:
-# - id: CVE ID уязвимости
-# - package: имя пакета
-# - version: версия пакета с уязвимостью
-# - severity: Critical/High/Medium/Low
-# - reason: обоснование исключения
-# - issue: ссылка на Issue/PR с обсуждением
-# - expires_at: дата пересмотра (ISO 8601)
-# - approved_by: email/username утвердившего
+waivers:
+  - id: "GHSA-5j98-mcp5-4vw2"
+    package: "glob"
+    version: "10.4.5"
+    severity: "High"
+    reason: |
+      Транзитивная зависимость через react-scripts в frontend.
+      Уязвимость затрагивает только CLI-инструмент glob, который не используется в нашем коде.
+      Мы используем только библиотечную часть glob через react-scripts.
+      Обновление требует обновления react-scripts (5.0.1 → последняя версия), что может привести к breaking changes.
+      Планируется обновление frontend-зависимостей в следующем релизе.
+      Срок пересмотра: 7 дней согласно политике (project/69_sbom-vuln-mgmt.md).
+    issue: "https://github.com/Davonchik/course-project-Davonchik/pull/17"
+    expires_at: "2025-12-01"  # 7 дней от текущей даты (24.11.2025 + 7 дней)
+    approved_by: "dgaslanian@edu.hse.ru"
 
-waivers: []
-# Примеры (раскомментируйте и заполните при необходимости):
-# waivers:
-#   - id: "CVE-2024-XXXX"
-#     package: "example-lib"
-#     version: "1.2.3"
-#     severity: "High"
-#     reason: |
-#       Транзитивная зависимость через fastapi.
-#       Уязвимость не затрагивает используемый функционал.
-#       Обновление пакета требует breaking changes в API.
-#     issue: "https://github.com/<org>/<repo>/issues/123"
-#     expires_at: "2025-12-31"
-#     approved_by: "tutor@example.org"
+  - id: "GHSA-rp65-9cf3-cjxr"
+    package: "nth-check"
+    version: "1.0.2"
+    severity: "High"
+    reason: |
+      Транзитивная зависимость через css-select (используется в react-scripts).
+      Уязвимость связана с неэффективной сложностью регулярных выражений (ReDoS).
+      В нашем коде nth-check используется только для парсинга CSS селекторов в dev-режиме.
+      Не представляет риска для production, так как не обрабатывает пользовательский ввод напрямую.
+      Обновление требует обновления css-select и связанных зависимостей.
+      Планируется обновление frontend-зависимостей в следующем релизе.
+      Срок пересмотра: 7 дней согласно политике (project/69_sbom-vuln-mgmt.md).
+    issue: "https://github.com/Davonchik/course-project-Davonchik/pull/17"
+    expires_at: "2025-12-01"  # 7 дней от текущей даты (24.11.2025 + 7 дней)
+    approved_by: "dgaslanian@edu.hse.ru"
