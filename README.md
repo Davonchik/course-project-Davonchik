@@ -1,5 +1,7 @@
 # Reading List Service
 
+![CI](https://github.com/Davonchik/course-project-Davonchik/actions/workflows/ci.yml/badge.svg)
+
 Сервис для хранения и управления списоком книг/статей «к прочтению»  (HSE SecDev 2025).
 
 ### Цели
