@@ -1,0 +1,27 @@
+# policy/waivers.yml — файл исключений для SBOM & SCA
+# См. project/69_sbom-vuln-mgmt.md для описания политики.
+
+# Структура waiver:
+# - id: CVE ID уязвимости
+# - package: имя пакета
+# - version: версия пакета с уязвимостью
+# - severity: Critical/High/Medium/Low
+# - reason: обоснование исключения
+# - issue: ссылка на Issue/PR с обсуждением
+# - expires_at: дата пересмотра (ISO 8601)
+# - approved_by: email/username утвердившего
+
+waivers: []
+# Примеры (раскомментируйте и заполните при необходимости):
+# waivers:
+#   - id: "CVE-2024-XXXX"
+#     package: "example-lib"
+#     version: "1.2.3"
+#     severity: "High"
+#     reason: |
+#       Транзитивная зависимость через fastapi.
+#       Уязвимость не затрагивает используемый функционал.
+#       Обновление пакета требует breaking changes в API.
+#     issue: "https://github.com/<org>/<repo>/issues/123"
+#     expires_at: "2025-12-31"
+#     approved_by: "tutor@example.org"
