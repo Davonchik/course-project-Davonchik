@@ -42,6 +42,8 @@ jobs:
           # Фиксируем версию Syft для воспроизводимости
           docker run --rm -v $PWD:/work -w /work anchore/syft:v0.102.0 \
             packages dir:. -o cyclonedx-json > EVIDENCE/P09/sbom.json
+          # Добавляем новую строку в конце для соответствия стандартам
+          echo "" >> EVIDENCE/P09/sbom.json
 
       - name: SCA Scan (Grype)
         run: |
@@ -49,6 +51,8 @@ jobs:
           # Фиксируем версию Grype для воспроизводимости
           docker run --rm -v $PWD:/work -w /work anchore/grype:v0.75.0 \
             sbom:/work/EVIDENCE/P09/sbom.json -o json > EVIDENCE/P09/sca_report.json || true
+          # Добавляем новую строку в конце для соответствия стандартам
+          [ -f EVIDENCE/P09/sca_report.json ] && echo "" >> EVIDENCE/P09/sca_report.json || true
 
       - name: Apply waivers (filter SCA report)
         run: |
@@ -91,8 +95,9 @@ jobs:
               (dropped if waived(m) else kept).append(m)
 
           data["matches"] = kept
-          out_filtered.write_text(json.dumps(data, ensure_ascii=False, indent=2))
-          out_waived.write_text(json.dumps({"waived": dropped}, ensure_ascii=False, indent=2))
+          # Добавляем новую строку в конце для соответствия стандартам
+          out_filtered.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n")
+          out_waived.write_text(json.dumps({"waived": dropped}, ensure_ascii=False, indent=2) + "\n")
           print(f"Kept: {len(kept)}, Waived: {len(dropped)}")
           PY
 
