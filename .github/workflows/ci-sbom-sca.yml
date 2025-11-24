@@ -180,15 +180,23 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
         with:
           name: P09_EVIDENCE
           path: EVIDENCE/P09
+
       - name: Commit evidence
         run: |
           git config user.email "action@github.com"
           git config user.name "GitHub Action"
           git add EVIDENCE/P09/
-          git diff --staged --quiet || git commit -m "chore: update SBOM & SCA evidence [skip ci]"
-          git push || echo "Nothing to push"
+          if ! git diff --staged --quiet; then
+            git commit -m "chore: update SBOM & SCA evidence [skip ci]"
+            git push
+          else
+            echo "No changes to commit"
+          fi
