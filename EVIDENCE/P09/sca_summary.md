@@ -1,8 +1,8 @@
 # SCA Summary
 
-**Generated at:** 2025-11-24 18:36:28 UTC
-**Commit:** `771a81d25d9498a917899700b82c15ac9af2da1c`
-**Workflow Run:** [\#13](https://github.com/Davonchik/course-project-Davonchik/actions/runs/19645161577)
+**Generated at:** 2025-11-24 19:13:36 UTC
+**Commit:** `5307be762cb7a6343387b6ad7e2307a3d2364d00`
+**Workflow Run:** [\#20](https://github.com/Davonchik/course-project-Davonchik/actions/runs/19646232005)
 **Branch:** `p09-sbom-sca`
 
 ## Vulnerability Summary by Severity
