@@ -6,7 +6,7 @@
 
 - `sbom.json` — Software Bill of Materials в формате CycloneDX JSON
   - Генерируется инструментом Syft v0.102.0 (фиксированная версия для воспроизводимости)
-  - Содержит все зависимости проекта (Python packages из `requirements*.txt`)
+  - Содержит все зависимости проекта (Python packages из `requirements*.txt`).
   - Включает метаданные о коммите, workflow run и времени генерации
 
 - `sca_report.json` — Полный отчёт SCA (Software Composition Analysis)
