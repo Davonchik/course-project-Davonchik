@@ -1,0 +1,56 @@
+rules:
+  - id: py-unsafe-jwt-secret
+    languages: [python]
+    message: "JWT secret should not use default/weak values. Use strong secrets from environment variables."
+    severity: WARNING
+    patterns:
+      - pattern-either:
+          - pattern: |
+              JWT_SECRET: str = "dev-secret-$X"
+          - pattern: |
+              JWT_SECRET: str = "change-me"
+          - pattern: |
+              JWT_SECRET: str = "secret"
+          - pattern: |
+              JWT_SECRET: str = "test"
+    metadata:
+      category: security
+      cwe: "CWE-798: Use of Hard-coded Credentials"
+      owasp: "A07:2021 – Identification and Authentication Failures"
+
+  - id: py-unsafe-password-default
+    languages: [python]
+    message: "Database password should not use default values in production code."
+    severity: WARNING
+    patterns:
+      - pattern: |
+          POSTGRES_PASSWORD: str = "postgres"
+    metadata:
+      category: security
+      cwe: "CWE-798: Use of Hard-coded Credentials"
+
+  - id: py-broad-exception-handling
+    languages: [python]
+    message: "Catching generic Exception may hide security issues. Be more specific."
+    severity: INFO
+    patterns:
+      - pattern: |
+          except Exception:
+            ...
+    metadata:
+      category: security
+      cwe: "CWE-703: Improper Check or Handling of Exceptional Conditions"
+
+  - id: py-jwt-decode-no-verification
+    languages: [python]
+    message: "JWT decode should verify signature and claims. Check that options include verification."
+    severity: INFO
+    patterns:
+      - pattern-not-inside: |
+          jwt.decode(..., options={..., "verify_signature": true, ...}, ...)
+      - pattern: |
+          jwt.decode($TOKEN, $SECRET, ...)
+    metadata:
+      category: security
+      cwe: "CWE-345: Insufficient Verification of Data Authenticity"
+      note: "This is informational - verify that your jwt.decode calls properly verify signatures"
