@@ -189,6 +189,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
 
       - name: Download artifacts
         uses: actions/download-artifact@v4
@@ -200,10 +202,11 @@ jobs:
         run: |
           git config user.email "action@github.com"
           git config user.name "GitHub Action"
+          git checkout -B ${{ github.ref_name }}
           git add EVIDENCE/P09/
           if ! git diff --staged --quiet; then
             git commit -m "chore: update SBOM & SCA evidence [skip ci]"
-            git push
+            git push origin HEAD:${{ github.ref_name }}
           else
             echo "No changes to commit"
           fi
