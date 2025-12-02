@@ -36,7 +36,10 @@ rules:
     patterns:
       - pattern: |
           except Exception:
-            ...
+            pass
+      - pattern: |
+          except Exception as $X:
+            pass
     metadata:
       category: security
       cwe: "CWE-703: Improper Check or Handling of Exceptional Conditions"
