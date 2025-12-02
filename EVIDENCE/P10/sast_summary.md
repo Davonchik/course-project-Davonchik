@@ -41,11 +41,50 @@
 
 ## Gitleaks Findings
 
-**Статус:** Отчёт будет сгенерирован при следующем запуске workflow.
+**Статус:** ✅ Сканирование завершено
 
-**Конфигурация allowlist:**
-- Исключены dev-секреты в `config.py` (JWT_SECRET, POSTGRES_PASSWORD)
-- Исключены директории: `EVIDENCE/`, `__pycache__/`, `node_modules/`, `.git/`, `build/`
+### Результаты
+- **Всего найдено:** 2 потенциальных секрета
+- **Критичных:** 0 (тестовый CI секрет)
+- **False positives:** 2 (CI test secret)
+
+### Детальный анализ
+
+#### 1. `generic-api-key` в `.github/workflows/ci.yml:245`
+- **Секрет:** `test-secret-key-for-ci-min-32-chars-long`
+- **Контекст:** Fallback значение для CI тестов
+- **Статус:** ✅ **Принято**
+- **Обоснование:**
+  - Это тестовое значение для GitHub Actions CI
+  - Используется только когда GitHub Secret не установлен
+  - Не используется в production
+  - Явно помечено как "test-secret-key-for-ci"
+- **Действие:** Добавлено в allowlist
+
+#### 2. `generic-api-key` в `.github/workflows/ci.yml:239`
+- **Секрет:** `test-secret-key-for-ci-min-32-chars-long`
+- **Контекст:** Переменная окружения для CI тестов
+- **Статус:** ✅ **Принято** (дубликат finding #1)
+- **Обоснование:** То же тестовое значение, найдено в другой строке
+- **Действие:** Добавлено в allowlist
+
+### Критичные секреты
+
+**Найдено критичных секретов:** 0
+
+**Политика работы с секретами:**
+- **JWT_SECRET:** В production загружается из GitHub Secrets (не хардкодится)
+- **Database credentials:** Управляются через CI/CD secrets
+- **API keys:** Не хранятся в коде, только в защищённых secrets stores
+- **CI test secrets:** Используются явные тестовые значения с префиксом "test-"
+- **Dev-окружение:** Безопасные дефолтные значения в config.py, явно помеченные как dev-only
+
+### Конфигурация allowlist
+
+В `security/.gitleaks.toml` добавлены исключения для:
+- Dev-секреты в `config.py` (JWT_SECRET, POSTGRES_PASSWORD, POSTGRES_USER, DATABASE_URL)
+- CI test secret (`test-secret-key-for-ci-min-32-chars-long`)
+- Директории: `EVIDENCE/`, `__pycache__/`, `node_modules/`, `.git/`, `build/`
 
 ## Итоговые действия
 
