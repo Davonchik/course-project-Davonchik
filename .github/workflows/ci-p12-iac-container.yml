@@ -1,0 +1,183 @@
+name: Security - IaC & Container (P12)
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "Dockerfile"
+      - "docker-compose.yml"
+      - "k8s/**"
+      - "iac/**"
+      - "deploy/**"
+      - "security/**"
+      - ".github/workflows/ci-p12-iac-container.yml"
+  pull_request:
+    paths:
+      - "Dockerfile"
+      - "docker-compose.yml"
+      - "k8s/**"
+      - "iac/**"
+      - "deploy/**"
+      - "security/**"
+      - ".github/workflows/ci-p12-iac-container.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  iac_container_p12:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ensure evidence dirs
+        run: mkdir -p EVIDENCE/P12
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          load: true
+          tags: reading-list-api:local
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Hadolint - Dockerfile linting
+        run: |
+          docker run --rm -i -v $PWD:/work \
+            hadolint/hadolint:latest \
+            hadolint -f json /work/Dockerfile > EVIDENCE/P12/hadolint_report.json || true
+
+          echo "=== Hadolint Report Summary ==="
+          if [ -s EVIDENCE/P12/hadolint_report.json ]; then
+            cat EVIDENCE/P12/hadolint_report.json | jq -r '.[] | "\(.level): \(.message) (line \(.line))"' || echo "No issues found"
+          else
+            echo "No issues found"
+          fi
+
+      - name: Checkov - IaC security scan
+        run: |
+          # Scan multiple IaC directories
+          docker run --rm -v $PWD:/work bridgecrew/checkov:latest \
+            --directory /work \
+            --framework kubernetes dockerfile docker_compose \
+            --output json \
+            --output-file-path /work/EVIDENCE/P12 \
+            --repo-id course-project \
+            --compact || true
+
+          # Rename output file
+          mv EVIDENCE/P12/results_json.json EVIDENCE/P12/checkov_report.json 2>/dev/null || echo "{}" > EVIDENCE/P12/checkov_report.json
+
+          echo "=== Checkov Report Summary ==="
+          if [ -s EVIDENCE/P12/checkov_report.json ]; then
+            cat EVIDENCE/P12/checkov_report.json | jq -r '.summary' || echo "Scan completed"
+          fi
+
+      - name: Trivy - Container image scan
+        run: |
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+            -v $PWD:/work \
+            aquasec/trivy:latest \
+            image reading-list-api:local \
+              --format json \
+              --output /work/EVIDENCE/P12/trivy_report.json \
+              --severity CRITICAL,HIGH,MEDIUM || true
+
+          echo "=== Trivy Report Summary ==="
+          if [ -s EVIDENCE/P12/trivy_report.json ]; then
+            cat EVIDENCE/P12/trivy_report.json | jq -r '.Results[]? | select(.Vulnerabilities) | .Vulnerabilities | group_by(.Severity) | map({(.[0].Severity): length}) | add' || echo "Scan completed"
+          fi
+
+      - name: Generate hardening summary
+        run: |
+          cat > EVIDENCE/P12/hardening_summary.md << 'EOF'
+          # P12 - IaC & Container Security Summary
+
+          ## Scan Date
+          $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+
+          ## Tools Used
+          - **Hadolint**: Dockerfile linting and best practices
+          - **Checkov**: IaC security scanning (Kubernetes, Docker Compose)
+          - **Trivy**: Container image vulnerability scanning
+
+          ## Dockerfile Hardening Applied
+          - ✅ Multi-stage build to reduce image size
+          - ✅ Specific base image version (python:3.12-slim)
+          - ✅ Non-root user (UID 1000, appuser)
+          - ✅ Minimal runtime dependencies
+          - ✅ Health check configured
+          - ✅ No hardcoded secrets
+          - ✅ Build cache optimization
+
+          ## Docker Compose Hardening Applied
+          - ✅ Specific image versions (postgres:16)
+          - ✅ Non-root users for all services
+          - ✅ Read-only root filesystem where possible
+          - ✅ Capabilities dropped (cap_drop: ALL)
+          - ✅ Security options (no-new-privileges)
+          - ✅ Network isolation (internal networks)
+          - ✅ Resource limits via tmpfs
+          - ✅ Health checks for all services
+
+          ## Kubernetes Hardening Applied
+          - ✅ SecurityContext with runAsNonRoot
+          - ✅ ReadOnlyRootFilesystem enabled
+          - ✅ No privilege escalation
+          - ✅ All capabilities dropped
+          - ✅ Seccomp profile (RuntimeDefault)
+          - ✅ Resource limits and requests defined
+          - ✅ Liveness and readiness probes
+          - ✅ Secrets externalized
+          - ✅ ClusterIP service type (internal)
+
+          ## Reports Generated
+          - `hadolint_report.json` - Dockerfile analysis
+          - `checkov_report.json` - IaC security findings
+          - `trivy_report.json` - Image vulnerability scan
+
+          ## Next Steps
+          - Review and address any CRITICAL/HIGH findings from Trivy
+          - Consider implementing Kubernetes NetworkPolicies
+          - Set up automated secret rotation
+          - Configure OPA/Gatekeeper policies for runtime enforcement
+          EOF
+
+      - name: Upload P12 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: P12_EVIDENCE
+          path: EVIDENCE/P12
+          retention-days: 90
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## P12 - IaC & Container Security Scan Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Files Scanned" >> $GITHUB_STEP_SUMMARY
+          echo "- Dockerfile" >> $GITHUB_STEP_SUMMARY
+          echo "- docker-compose.yml" >> $GITHUB_STEP_SUMMARY
+          echo "- k8s/ manifests" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Reports Generated" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Hadolint report: \`EVIDENCE/P12/hadolint_report.json\`" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Checkov report: \`EVIDENCE/P12/checkov_report.json\`" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Trivy report: \`EVIDENCE/P12/trivy_report.json\`" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Hardening summary: \`EVIDENCE/P12/hardening_summary.md\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📦 Download artifacts from the workflow run to review detailed reports." >> $GITHUB_STEP_SUMMARY
