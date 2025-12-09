@@ -1,1 +1,4 @@
 * text=auto eol=lf
+# Исключить сгенерированные ZAP отчёты из форматирования
+EVIDENCE/P11/zap_baseline.html linguist-generated=true
+EVIDENCE/P11/zap_baseline.json linguist-generated=true
