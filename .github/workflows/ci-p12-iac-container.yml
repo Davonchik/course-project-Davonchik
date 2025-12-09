@@ -69,21 +69,22 @@ jobs:
 
       - name: Checkov - IaC security scan
         run: |
-          # Scan multiple IaC directories
+          # Scan IaC files (K8s, docker-compose, Dockerfile)
           docker run --rm -v $PWD:/work bridgecrew/checkov:latest \
             --directory /work \
             --framework kubernetes dockerfile docker_compose \
             --output json \
-            --output-file-path /work/EVIDENCE/P12 \
+            --output-file /work/EVIDENCE/P12/checkov_report.json \
             --repo-id course-project \
-            --compact || true
-
-          # Rename output file
-          mv EVIDENCE/P12/results_json.json EVIDENCE/P12/checkov_report.json 2>/dev/null || echo "{}" > EVIDENCE/P12/checkov_report.json
+            --compact \
+            --soft-fail || true
 
           echo "=== Checkov Report Summary ==="
           if [ -s EVIDENCE/P12/checkov_report.json ]; then
-            cat EVIDENCE/P12/checkov_report.json | jq -r '.summary' || echo "Scan completed"
+            cat EVIDENCE/P12/checkov_report.json | jq -r '.summary // "Scan completed"' || echo "Scan completed"
+          else
+            echo "No issues found or scan failed - creating empty report"
+            echo '{"summary": {"passed": 0, "failed": 0, "skipped": 0}}' > EVIDENCE/P12/checkov_report.json
           fi
 
       - name: Trivy - Container image scan
@@ -103,11 +104,12 @@ jobs:
 
       - name: Generate hardening summary
         run: |
-          cat > EVIDENCE/P12/hardening_summary.md << 'EOF'
+          SCAN_DATE=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          cat > EVIDENCE/P12/hardening_summary.md << EOF
           # P12 - IaC & Container Security Summary
 
           ## Scan Date
-          $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          ${SCAN_DATE}
 
           ## Tools Used
           - **Hadolint**: Dockerfile linting and best practices
