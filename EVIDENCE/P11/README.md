@@ -12,6 +12,9 @@ This directory contains DAST (Dynamic Application Security Testing) reports gene
 - **URL**: `http://localhost:8000/`
 - **Service**: Reading List API (FastAPI)
 - **Health Endpoint**: `/health`
+- **Swagger UI**: `/docs` (публичный, без авторизации)
+- **ReDoc**: `/redoc` (публичный, без авторизации)
+- **OpenAPI Schema**: `/openapi.json` (публичный, без авторизации)
 
 ## Workflow
 
