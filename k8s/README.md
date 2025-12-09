@@ -52,7 +52,7 @@ kubectl apply -f k8s/service.yaml -n reading-list
 
 ## Important Notes
 
-⚠️ **DO NOT** commit real secrets to git! The secret files are templates only.
+**DO NOT** commit real secrets to git! The secret files are templates only.
 
 In production:
 - Use external secrets management (e.g., Sealed Secrets, External Secrets Operator)
