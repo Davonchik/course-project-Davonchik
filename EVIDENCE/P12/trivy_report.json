@@ -1,17 +1,17 @@
 {
   "SchemaVersion": 2,
-  "ReportID": "019b0492-7e44-7bac-b20a-3894774d46f8",
-  "CreatedAt": "2025-12-09T19:24:28.100766103Z",
-  "ArtifactID": "sha256:f430df5adc79851915f75cc536ea227b16e6e8274e7b1cab074dbeb9cc2a32be",
+  "ReportID": "019b04a0-ec2f-747e-a128-05c32cf94e5a",
+  "CreatedAt": "2025-12-09T19:40:13.743295824Z",
+  "ArtifactID": "sha256:3203bda797c368b79cc0bc50035d33b27ac769f6f483cccc6fe97e4fbf103d77",
   "ArtifactName": "reading-list-api:local",
   "ArtifactType": "container_image",
   "Metadata": {
-    "Size": 322169856,
+    "Size": 322621952,
     "OS": {
       "Family": "debian",
       "Name": "13.2"
     },
-    "ImageID": "sha256:4649ed704f9f8b54e2160be35c8953dcb72634add6e4abd40ae96d471452bc0f",
+    "ImageID": "sha256:6b1529e98e41f5092efc526e850995a013d35cac0fb8dc2937290e496a114183",
     "DiffIDs": [
       "sha256:77a2b55fbe8b9984ce0af3ffc0b0ab62507668e63306ec161a585e587a3eb164",
       "sha256:d3ed01caa08409d7ff04793f0b0dfb39c0d1939740be551109e87f0e62b0a9f0",
@@ -23,7 +23,7 @@
       "sha256:15b03c8621c3cba41c531efad85364b818d043bcafd9375a46eb61fa6f045fa5",
       "sha256:582af97bac88a89b63224de0aa8c49a903d03674cf7e96b2cc9f78126a22801a",
       "sha256:aadd61aaceb20af63135fa68d866b4dbac84870d46eb03cbe9f2d7f335b941ab",
-      "sha256:81c85b531674f54381d736e7dc9ff820057ae57acb0e41820b12b50c262dffdc"
+      "sha256:6d4cfeb62d3849aef467d4a9bde21ce51a26bbe6b39769ccbf8fd7291c781f80"
     ],
     "RepoTags": [
       "reading-list-api:local"
@@ -31,7 +31,7 @@
     "Reference": "reading-list-api:local",
     "ImageConfig": {
       "architecture": "amd64",
-      "created": "2025-12-09T19:23:53.421796557Z",
+      "created": "2025-12-09T19:39:41.936758931Z",
       "history": [
         {
           "created": "2025-12-08T00:00:00Z",
@@ -132,30 +132,30 @@
           "comment": "buildkit.dockerfile.v0"
         },
         {
-          "created": "2025-12-09T19:23:53Z",
+          "created": "2025-12-09T19:39:41Z",
           "created_by": "COPY --chown=appuser:appuser . . # buildkit",
           "comment": "buildkit.dockerfile.v0"
         },
         {
-          "created": "2025-12-09T19:23:53Z",
+          "created": "2025-12-09T19:39:41Z",
           "created_by": "EXPOSE map[8000/tcp:{}]",
           "comment": "buildkit.dockerfile.v0",
           "empty_layer": true
         },
         {
-          "created": "2025-12-09T19:23:53Z",
+          "created": "2025-12-09T19:39:41Z",
           "created_by": "USER appuser",
           "comment": "buildkit.dockerfile.v0",
           "empty_layer": true
         },
         {
-          "created": "2025-12-09T19:23:53Z",
+          "created": "2025-12-09T19:39:41Z",
           "created_by": "HEALTHCHECK \u0026{[\"CMD-SHELL\" \"curl -f http://127.0.0.1:8000/health || exit 1\"] \"30s\" \"5s\" \"15s\" \"0s\" '\\x03'}",
           "comment": "buildkit.dockerfile.v0",
           "empty_layer": true
         },
         {
-          "created": "2025-12-09T19:23:53Z",
+          "created": "2025-12-09T19:39:41Z",
           "created_by": "CMD [\"uvicorn\" \"app.main:app\" \"--host\" \"0.0.0.0\" \"--port\" \"8000\" \"--workers\" \"1\"]",
           "comment": "buildkit.dockerfile.v0",
           "empty_layer": true
@@ -175,7 +175,7 @@
           "sha256:15b03c8621c3cba41c531efad85364b818d043bcafd9375a46eb61fa6f045fa5",
           "sha256:582af97bac88a89b63224de0aa8c49a903d03674cf7e96b2cc9f78126a22801a",
           "sha256:aadd61aaceb20af63135fa68d866b4dbac84870d46eb03cbe9f2d7f335b941ab",
-          "sha256:81c85b531674f54381d736e7dc9ff820057ae57acb0e41820b12b50c262dffdc"
+          "sha256:6d4cfeb62d3849aef467d4a9bde21ce51a26bbe6b39769ccbf8fd7291c781f80"
         ]
       },
       "config": {
@@ -268,8 +268,8 @@
         "DiffID": "sha256:aadd61aaceb20af63135fa68d866b4dbac84870d46eb03cbe9f2d7f335b941ab"
       },
       {
-        "Size": 1896448,
-        "DiffID": "sha256:81c85b531674f54381d736e7dc9ff820057ae57acb0e41820b12b50c262dffdc"
+        "Size": 2348544,
+        "DiffID": "sha256:6d4cfeb62d3849aef467d4a9bde21ce51a26bbe6b39769ccbf8fd7291c781f80"
       }
     ]
   },
@@ -8473,7 +8473,7 @@
             "Name": "Debian Security Tracker",
             "URL": "https://salsa.debian.org/security-tracker-team/security-tracker"
           },
-          "Fingerprint": "sha256:bd041fe0e5e55c7d4f9f813239bf953dd7bdef88b9ae31c57d02ee3fa4ea99df",
+          "Fingerprint": "sha256:6398f30d2c5eb15d2e5e3626c7e1d094ae4859c758b234e620428abb232a6048",
           "Title": "util-linux: util-linux: Heap buffer overread in setpwnam() when processing 256-byte usernames",
           "Description": "A flaw was found in util-linux. This vulnerability allows a heap buffer overread when processing 256-byte usernames, specifically within the `setpwnam()` function, affecting SUID (Set User ID) login-utils utilities writing to the password database.",
           "Severity": "MEDIUM",
@@ -8517,7 +8517,7 @@
             "Name": "Debian Security Tracker",
             "URL": "https://salsa.debian.org/security-tracker-team/security-tracker"
           },
-          "Fingerprint": "sha256:fc75cdc24da03f8c70f503934bb91ccae356518002e1acedd0e15fc7c160b330",
+          "Fingerprint": "sha256:0f74fdf4064ed67d48c4b00a8e30f85e7269762123232d784a109755abf934ec",
           "Title": "util-linux: util-linux: Heap buffer overread in setpwnam() when processing 256-byte usernames",
           "Description": "A flaw was found in util-linux. This vulnerability allows a heap buffer overread when processing 256-byte usernames, specifically within the `setpwnam()` function, affecting SUID (Set User ID) login-utils utilities writing to the password database.",
           "Severity": "MEDIUM",
@@ -8561,7 +8561,7 @@
             "Name": "Debian Security Tracker",
             "URL": "https://salsa.debian.org/security-tracker-team/security-tracker"
           },
-          "Fingerprint": "sha256:47bb44526d150e26e7e81e22b8688ac09c9a49873410e998b9e4df906aa5b972",
+          "Fingerprint": "sha256:0c8d7ec690c5548a9fdc393cef90b0ad70a4267c249bc4a3f3ab336a41fb13a6",
           "Title": "util-linux: util-linux: Heap buffer overread in setpwnam() when processing 256-byte usernames",
           "Description": "A flaw was found in util-linux. This vulnerability allows a heap buffer overread when processing 256-byte usernames, specifically within the `setpwnam()` function, affecting SUID (Set User ID) login-utils utilities writing to the password database.",
           "Severity": "MEDIUM",
@@ -8605,7 +8605,7 @@
             "Name": "Debian Security Tracker",
             "URL": "https://salsa.debian.org/security-tracker-team/security-tracker"
           },
-          "Fingerprint": "sha256:631e43944055a3c0072359209ca27c93f432af0b1fb68368494216513dc4a205",
+          "Fingerprint": "sha256:be2e6b628f20d3f717b4d4270da4c971ff2bc414f3edc3c339d6f52a2634b56d",
           "Title": "util-linux: util-linux: Heap buffer overread in setpwnam() when processing 256-byte usernames",
           "Description": "A flaw was found in util-linux. This vulnerability allows a heap buffer overread when processing 256-byte usernames, specifically within the `setpwnam()` function, affecting SUID (Set User ID) login-utils utilities writing to the password database.",
           "Severity": "MEDIUM",
@@ -8649,7 +8649,7 @@
             "Name": "Debian Security Tracker",
             "URL": "https://salsa.debian.org/security-tracker-team/security-tracker"
           },
-          "Fingerprint": "sha256:e4819bd743bdfd1c1583a721e6307196484e5d92c82f5407ef273c221d797f28",
+          "Fingerprint": "sha256:ba9d40040e2d6f8fb11fdd17d6ea8b74ae30b2633e00b6f3034bcd514244ec06",
           "Title": "postgresql: libpq undersizes allocations, via integer wraparound",
           "Description": "Integer wraparound in multiple PostgreSQL libpq client library functions allows an application input provider or network peer to cause libpq to undersize an allocation and write out-of-bounds by hundreds of megabytes.  This results in a segmentation fault for the application using libpq.  Versions before PostgreSQL 18.1, 17.7, 16.11, 15.15, 14.20, and 13.23 are affected.",
           "Severity": "HIGH",
@@ -8702,7 +8702,7 @@
             "Name": "Debian Security Tracker",
             "URL": "https://salsa.debian.org/security-tracker-team/security-tracker"
           },
-          "Fingerprint": "sha256:2236d787a9746a300aa7d0860deded39e7322c92e111f1d411a9af6f530ef197",
+          "Fingerprint": "sha256:648a217dcd0fa3e19f07d56905a8b2598266aa0c2e18cfa46295e4b4d3833b5d",
           "Title": "postgresql: CREATE STATISTICS does not check for schema CREATE privilege",
           "Description": "Missing authorization in PostgreSQL CREATE STATISTICS command allows a table owner to achieve denial of service against other CREATE STATISTICS users by creating in any schema.  A later CREATE STATISTICS for the same name, from a user having the CREATE privilege, would then fail.  Versions before PostgreSQL 18.1, 17.7, 16.11, 15.15, 14.20, and 13.23 are affected.",
           "Severity": "MEDIUM",
@@ -8755,7 +8755,7 @@
             "Name": "Debian Security Tracker",
             "URL": "https://salsa.debian.org/security-tracker-team/security-tracker"
           },
-          "Fingerprint": "sha256:f41ad756d627180f0a5b418470010d4060a83aaaa2ef7006a0db289b2050c4d0",
+          "Fingerprint": "sha256:6aefaf46046082846523b8547d58f4c0efd86595a795881da95dbcf0840e108c",
           "Title": "util-linux: util-linux: Heap buffer overread in setpwnam() when processing 256-byte usernames",
           "Description": "A flaw was found in util-linux. This vulnerability allows a heap buffer overread when processing 256-byte usernames, specifically within the `setpwnam()` function, affecting SUID (Set User ID) login-utils utilities writing to the password database.",
           "Severity": "MEDIUM",
@@ -8799,7 +8799,7 @@
             "Name": "Debian Security Tracker",
             "URL": "https://salsa.debian.org/security-tracker-team/security-tracker"
           },
-          "Fingerprint": "sha256:fd6f2e6d67153b553fbeb4cff0e006e7909eb0e48808515b50e451f7acd4082e",
+          "Fingerprint": "sha256:dd42586fce0f424bd93a5d31bceb934056f0aedf39fc9fab94b61d3d77cb7a0e",
           "Title": "An integer overflow exists in the  FTS5 https://sqlite.org/fts5.html e ...",
           "Description": "An integer overflow exists in the  FTS5 https://sqlite.org/fts5.html  extension. It occurs when the size of an array of tombstone pointers is calculated and truncated into a 32-bit integer. A pointer to partially controlled data can then be written out of bounds.",
           "Severity": "MEDIUM",
@@ -8839,7 +8839,7 @@
             "Name": "Debian Security Tracker",
             "URL": "https://salsa.debian.org/security-tracker-team/security-tracker"
           },
-          "Fingerprint": "sha256:65c7ef038db84c772a886cde0546415a63ba3013d5edf03240afb57af61997f7",
+          "Fingerprint": "sha256:1aae7c9eb037ae95a3b752d6339ef58b35732bc6cf994e86c018a1359b2f3fcd",
           "Title": "util-linux: util-linux: Heap buffer overread in setpwnam() when processing 256-byte usernames",
           "Description": "A flaw was found in util-linux. This vulnerability allows a heap buffer overread when processing 256-byte usernames, specifically within the `setpwnam()` function, affecting SUID (Set User ID) login-utils utilities writing to the password database.",
           "Severity": "MEDIUM",
@@ -8883,7 +8883,7 @@
             "Name": "Debian Security Tracker",
             "URL": "https://salsa.debian.org/security-tracker-team/security-tracker"
           },
-          "Fingerprint": "sha256:ff3e7d78a8521a4cda189e8622bc814b1c0dae073990f76e4441e78bde09c6d8",
+          "Fingerprint": "sha256:63d561feaae0061db9c33a2df378d1095d7ede97595095ded66e1706281fba66",
           "Title": "util-linux: util-linux: Heap buffer overread in setpwnam() when processing 256-byte usernames",
           "Description": "A flaw was found in util-linux. This vulnerability allows a heap buffer overread when processing 256-byte usernames, specifically within the `setpwnam()` function, affecting SUID (Set User ID) login-utils utilities writing to the password database.",
           "Severity": "MEDIUM",
@@ -8927,7 +8927,7 @@
             "Name": "Debian Security Tracker",
             "URL": "https://salsa.debian.org/security-tracker-team/security-tracker"
           },
-          "Fingerprint": "sha256:22d59534fa98bb1d451711d5382e6bbdb58e3f255011e5664fbd2f28878dba0a",
+          "Fingerprint": "sha256:26c415507ed9720a113f3cec1cc9210d2b5d013cedb792c55d8917e39abd666c",
           "Title": "util-linux: util-linux: Heap buffer overread in setpwnam() when processing 256-byte usernames",
           "Description": "A flaw was found in util-linux. This vulnerability allows a heap buffer overread when processing 256-byte usernames, specifically within the `setpwnam()` function, affecting SUID (Set User ID) login-utils utilities writing to the password database.",
           "Severity": "MEDIUM",
@@ -8971,7 +8971,7 @@
             "Name": "Debian Security Tracker",
             "URL": "https://salsa.debian.org/security-tracker-team/security-tracker"
           },
-          "Fingerprint": "sha256:f541968fedb4c97f547dd254a6e63e90126540a6fa9e920ecfed38026a6a2c9f",
+          "Fingerprint": "sha256:ce7ec1799e2cfe2ea5845b80801bd0606d26a8c61c3ef91b2fc19029e905110f",
           "Title": "util-linux: util-linux: Heap buffer overread in setpwnam() when processing 256-byte usernames",
           "Description": "A flaw was found in util-linux. This vulnerability allows a heap buffer overread when processing 256-byte usernames, specifically within the `setpwnam()` function, affecting SUID (Set User ID) login-utils utilities writing to the password database.",
           "Severity": "MEDIUM",
@@ -9808,7 +9808,7 @@
             "Name": "GitHub Security Advisory pip",
             "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
           },
-          "Fingerprint": "sha256:f18016e4aa66cb8dcdf956d52a8bffea7fe405b09f8116fe214f70ab8d8233b9",
+          "Fingerprint": "sha256:bb677cee36da3df1df10c5dd444440add3f1fc4934c86d2e846ac1c0a1c15bdc",
           "Title": "pip: pip missing checks on symbolic link extraction",
           "Description": "When extracting a tar archive pip may not check symbolic links point into the extraction directory if the tarfile module doesn't implement PEP 706.\nNote that upgrading pip to a \"fixed\" version for this vulnerability doesn't fix all known vulnerabilities that are remediated by using a Python version that implements PEP 706.\n\nNote that this is a vulnerability in pip's fallback implementation of tar extraction for Python versions that don't implement PEP 706\nand therefore are not secure to all vulnerabilities in the Python 'tarfile' module. If you're using a Python version that implements PEP 706\nthen pip doesn't use the \"vulnerable\" fallback code.\n\nMitigations include upgrading to a version of pip that includes the fix, upgrading to a Python version that implements PEP 706 (Python \u003e=3.9.17, \u003e=3.10.12, \u003e=3.11.4, or \u003e=3.12),\napplying the linked patch, or inspecting source distributions (sdists) before installation as is already a best-practice.",
           "Severity": "MEDIUM",
@@ -9860,7 +9860,7 @@
             "Name": "GitHub Security Advisory pip",
             "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
           },
-          "Fingerprint": "sha256:3fff5cda1c81fbdc77afa101405718f7fae9eeb681dbbaa34356efe6915f98bb",
+          "Fingerprint": "sha256:6b6ee1abc14b84fdb9ccf9a03970aff2b3ca676d29c0d2478526292c38ce0363",
           "Title": "starlette: Starlette DoS via Range header merging",
           "Description": "Starlette is a lightweight ASGI framework/toolkit. Starting in version 0.39.0 and prior to version 0.49.1 , an unauthenticated attacker can send a crafted HTTP Range header that triggers quadratic-time processing in Starlette's FileResponse Range parsing/merging logic. This enables CPU exhaustion per request, causing denial‑of‑service for endpoints serving files (e.g., StaticFiles or any use of FileResponse). This vulnerability is fixed in 0.49.1.",
           "Severity": "HIGH",

@@ -1,7 +1,7 @@
 # P12 - IaC & Container Security Summary
 
 ## Scan Date
-2025-12-09 19:24:28 UTC
+2025-12-09 19:40:14 UTC
 
 ## Tools Used
 - **Hadolint**: Dockerfile linting and best practices
