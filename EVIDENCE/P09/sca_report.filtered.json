@@ -2,6 +2,106 @@
   "matches": [
     {
       "vulnerability": {
+        "id": "GHSA-5j98-mcp5-4vw2",
+        "dataSource": "https://github.com/advisories/GHSA-5j98-mcp5-4vw2",
+        "namespace": "github:language:javascript",
+        "severity": "High",
+        "urls": [
+          "https://github.com/advisories/GHSA-5j98-mcp5-4vw2"
+        ],
+        "description": "glob CLI: Command injection via -c/--cmd executes matches with shell:true",
+        "cvss": [
+          {
+            "version": "3.1",
+            "vector": "CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H",
+            "metrics": {
+              "baseScore": 7.5,
+              "exploitabilityScore": 1.6,
+              "impactScore": 5.9
+            },
+            "vendorMetadata": {
+              "base_severity": "High",
+              "status": "N/A"
+            }
+          }
+        ],
+        "fix": {
+          "versions": [
+            "10.5.0"
+          ],
+          "state": "fixed"
+        },
+        "advisories": []
+      },
+      "relatedVulnerabilities": [
+        {
+          "id": "CVE-2025-64756",
+          "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2025-64756",
+          "namespace": "nvd:cpe",
+          "severity": "High",
+          "urls": [
+            "https://github.com/isaacs/node-glob/commit/1e4e297342a09f2aa0ced87fcd4a70ddc325d75f",
+            "https://github.com/isaacs/node-glob/commit/47473c046b91c67269df7a66eab782a6c2716146",
+            "https://github.com/isaacs/node-glob/security/advisories/GHSA-5j98-mcp5-4vw2"
+          ],
+          "description": "Glob matches files using patterns the shell uses. Starting in version 10.2.0 and prior to versions 10.5.0 and 11.1.0, the glob CLI contains a command injection vulnerability in its -c/--cmd option that allows arbitrary command execution when processing files with malicious names. When glob -c <command> <patterns> are used, matched filenames are passed to a shell with shell: true, enabling shell metacharacters in filenames to trigger command injection and achieve arbitrary code execution under the user or CI account privileges. This issue has been patched in versions 10.5.0 and 11.1.0.",
+          "cvss": [
+            {
+              "source": "security-advisories@github.com",
+              "type": "Secondary",
+              "version": "3.1",
+              "vector": "CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H",
+              "metrics": {
+                "baseScore": 7.5,
+                "exploitabilityScore": 1.6,
+                "impactScore": 5.9
+              },
+              "vendorMetadata": {}
+            }
+          ]
+        }
+      ],
+      "matchDetails": [
+        {
+          "type": "exact-direct-match",
+          "matcher": "javascript-matcher",
+          "searchedBy": {
+            "language": "javascript",
+            "namespace": "github:language:javascript",
+            "package": {
+              "name": "glob",
+              "version": "10.4.5"
+            }
+          },
+          "found": {
+            "versionConstraint": ">=10.2.0,<10.5.0 (unknown)",
+            "vulnerabilityID": "GHSA-5j98-mcp5-4vw2"
+          }
+        }
+      ],
+      "artifact": {
+        "id": "efb0d4fd082e13e9",
+        "name": "glob",
+        "version": "10.4.5",
+        "type": "npm",
+        "locations": [
+          {
+            "path": "/reading_list_frontend/package-lock.json"
+          }
+        ],
+        "language": "javascript",
+        "licenses": [
+          "ISC"
+        ],
+        "cpes": [
+          "cpe:2.3:a:glob:glob:10.4.5:*:*:*:*:*:*:*"
+        ],
+        "purl": "pkg:npm/glob@10.4.5",
+        "upstreams": []
+      }
+    },
+    {
+      "vulnerability": {
         "id": "GHSA-mh29-5h37-fv8m",
         "dataSource": "https://github.com/advisories/GHSA-mh29-5h37-fv8m",
         "namespace": "github:language:javascript",
@@ -205,6 +305,440 @@
           "cpe:2.3:a:js:js_yaml:4.1.0:*:*:*:*:*:*:*"
         ],
         "purl": "pkg:npm/js-yaml@4.1.0",
+        "upstreams": []
+      }
+    },
+    {
+      "vulnerability": {
+        "id": "GHSA-5gfm-wpxj-wjgq",
+        "dataSource": "https://github.com/advisories/GHSA-5gfm-wpxj-wjgq",
+        "namespace": "github:language:javascript",
+        "severity": "High",
+        "urls": [
+          "https://github.com/advisories/GHSA-5gfm-wpxj-wjgq"
+        ],
+        "description": "node-forge has an Interpretation Conflict vulnerability via its ASN.1 Validator Desynchronization",
+        "cvss": [
+          {
+            "version": "3.1",
+            "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:N/I:H/A:N",
+            "metrics": {
+              "baseScore": 8.6,
+              "exploitabilityScore": 3.9,
+              "impactScore": 4
+            },
+            "vendorMetadata": {
+              "base_severity": "High",
+              "status": "N/A"
+            }
+          }
+        ],
+        "fix": {
+          "versions": [
+            "1.3.2"
+          ],
+          "state": "fixed"
+        },
+        "advisories": []
+      },
+      "relatedVulnerabilities": [
+        {
+          "id": "CVE-2025-12816",
+          "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2025-12816",
+          "namespace": "nvd:cpe",
+          "severity": "High",
+          "urls": [
+            "https://github.com/digitalbazaar/forge",
+            "https://github.com/digitalbazaar/forge/pull/1124",
+            "https://github.com/digitalbazaar/forge/security/advisories/GHSA-5gfm-wpxj-wjgq",
+            "https://kb.cert.org/vuls/id/521113",
+            "https://www.npmjs.com/package/node-forge",
+            "https://www.kb.cert.org/vuls/id/521113"
+          ],
+          "description": "An interpretation-conflict (CWE-436) vulnerability in node-forge versions 1.3.1 and earlier enables unauthenticated attackers to craft ASN.1 structures to desynchronize schema validations, yielding a semantic divergence that may bypass downstream cryptographic verifications and security decisions.",
+          "cvss": [
+            {
+              "source": "134c704f-9b21-4f2e-91b3-4a467353bcc0",
+              "type": "Secondary",
+              "version": "3.1",
+              "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:N/I:H/A:N",
+              "metrics": {
+                "baseScore": 8.6,
+                "exploitabilityScore": 3.9,
+                "impactScore": 4
+              },
+              "vendorMetadata": {}
+            }
+          ]
+        }
+      ],
+      "matchDetails": [
+        {
+          "type": "exact-direct-match",
+          "matcher": "javascript-matcher",
+          "searchedBy": {
+            "language": "javascript",
+            "namespace": "github:language:javascript",
+            "package": {
+              "name": "node-forge",
+              "version": "1.3.1"
+            }
+          },
+          "found": {
+            "versionConstraint": "<1.3.2 (unknown)",
+            "vulnerabilityID": "GHSA-5gfm-wpxj-wjgq"
+          }
+        }
+      ],
+      "artifact": {
+        "id": "8f6c8524f69a351b",
+        "name": "node-forge",
+        "version": "1.3.1",
+        "type": "npm",
+        "locations": [
+          {
+            "path": "/reading_list_frontend/package-lock.json"
+          }
+        ],
+        "language": "javascript",
+        "licenses": [],
+        "cpes": [
+          "cpe:2.3:a:node-forge:node-forge:1.3.1:*:*:*:*:*:*:*",
+          "cpe:2.3:a:node-forge:node_forge:1.3.1:*:*:*:*:*:*:*",
+          "cpe:2.3:a:node_forge:node-forge:1.3.1:*:*:*:*:*:*:*",
+          "cpe:2.3:a:node_forge:node_forge:1.3.1:*:*:*:*:*:*:*",
+          "cpe:2.3:a:node:node-forge:1.3.1:*:*:*:*:*:*:*",
+          "cpe:2.3:a:node:node_forge:1.3.1:*:*:*:*:*:*:*"
+        ],
+        "purl": "pkg:npm/node-forge@1.3.1",
+        "upstreams": []
+      }
+    },
+    {
+      "vulnerability": {
+        "id": "GHSA-554w-wpv2-vw27",
+        "dataSource": "https://github.com/advisories/GHSA-554w-wpv2-vw27",
+        "namespace": "github:language:javascript",
+        "severity": "High",
+        "urls": [
+          "https://github.com/advisories/GHSA-554w-wpv2-vw27"
+        ],
+        "description": "node-forge has ASN.1 Unbounded Recursion",
+        "cvss": [],
+        "fix": {
+          "versions": [
+            "1.3.2"
+          ],
+          "state": "fixed"
+        },
+        "advisories": []
+      },
+      "relatedVulnerabilities": [
+        {
+          "id": "CVE-2025-66031",
+          "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2025-66031",
+          "namespace": "nvd:cpe",
+          "severity": "High",
+          "urls": [
+            "https://github.com/digitalbazaar/forge/commit/260425c6167a38aae038697132483b5517b26451",
+            "https://github.com/digitalbazaar/forge/security/advisories/GHSA-554w-wpv2-vw27"
+          ],
+          "description": "Forge (also called `node-forge`) is a native implementation of Transport Layer Security in JavaScript. An Uncontrolled Recursion vulnerability in node-forge versions 1.3.1 and below enables remote, unauthenticated attackers to craft deep ASN.1 structures that trigger unbounded recursive parsing. This leads to a Denial-of-Service (DoS) via stack exhaustion when parsing untrusted DER inputs. This issue has been patched in version 1.3.2.",
+          "cvss": [
+            {
+              "source": "nvd@nist.gov",
+              "type": "Primary",
+              "version": "3.1",
+              "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "metrics": {
+                "baseScore": 7.5,
+                "exploitabilityScore": 3.9,
+                "impactScore": 3.6
+              },
+              "vendorMetadata": {}
+            },
+            {
+              "source": "security-advisories@github.com",
+              "type": "Secondary",
+              "version": "4.0",
+              "vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X",
+              "metrics": {
+                "baseScore": 8.7
+              },
+              "vendorMetadata": {}
+            }
+          ]
+        }
+      ],
+      "matchDetails": [
+        {
+          "type": "exact-direct-match",
+          "matcher": "javascript-matcher",
+          "searchedBy": {
+            "language": "javascript",
+            "namespace": "github:language:javascript",
+            "package": {
+              "name": "node-forge",
+              "version": "1.3.1"
+            }
+          },
+          "found": {
+            "versionConstraint": "<1.3.2 (unknown)",
+            "vulnerabilityID": "GHSA-554w-wpv2-vw27"
+          }
+        }
+      ],
+      "artifact": {
+        "id": "8f6c8524f69a351b",
+        "name": "node-forge",
+        "version": "1.3.1",
+        "type": "npm",
+        "locations": [
+          {
+            "path": "/reading_list_frontend/package-lock.json"
+          }
+        ],
+        "language": "javascript",
+        "licenses": [],
+        "cpes": [
+          "cpe:2.3:a:node-forge:node-forge:1.3.1:*:*:*:*:*:*:*",
+          "cpe:2.3:a:node-forge:node_forge:1.3.1:*:*:*:*:*:*:*",
+          "cpe:2.3:a:node_forge:node-forge:1.3.1:*:*:*:*:*:*:*",
+          "cpe:2.3:a:node_forge:node_forge:1.3.1:*:*:*:*:*:*:*",
+          "cpe:2.3:a:node:node-forge:1.3.1:*:*:*:*:*:*:*",
+          "cpe:2.3:a:node:node_forge:1.3.1:*:*:*:*:*:*:*"
+        ],
+        "purl": "pkg:npm/node-forge@1.3.1",
+        "upstreams": []
+      }
+    },
+    {
+      "vulnerability": {
+        "id": "GHSA-65ch-62r8-g69g",
+        "dataSource": "https://github.com/advisories/GHSA-65ch-62r8-g69g",
+        "namespace": "github:language:javascript",
+        "severity": "Medium",
+        "urls": [
+          "https://github.com/advisories/GHSA-65ch-62r8-g69g"
+        ],
+        "description": "node-forge is vulnerable to ASN.1 OID Integer Truncation",
+        "cvss": [],
+        "fix": {
+          "versions": [
+            "1.3.2"
+          ],
+          "state": "fixed"
+        },
+        "advisories": []
+      },
+      "relatedVulnerabilities": [
+        {
+          "id": "CVE-2025-66030",
+          "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2025-66030",
+          "namespace": "nvd:cpe",
+          "severity": "Medium",
+          "urls": [
+            "https://github.com/digitalbazaar/forge/commit/3e0c35ace169cfca529a3e547a7848dc7bf57fdb",
+            "https://github.com/digitalbazaar/forge/security/advisories/GHSA-65ch-62r8-g69g"
+          ],
+          "description": "Forge (also called `node-forge`) is a native implementation of Transport Layer Security in JavaScript. An Integer Overflow vulnerability in node-forge versions 1.3.1 and below enables remote, unauthenticated attackers to craft ASN.1 structures containing OIDs with oversized arcs. These arcs may be decoded as smaller, trusted OIDs due to 32-bit bitwise truncation, enabling the bypass of downstream OID-based security decisions. This issue has been patched in version 1.3.2.",
+          "cvss": [
+            {
+              "source": "nvd@nist.gov",
+              "type": "Primary",
+              "version": "3.1",
+              "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N",
+              "metrics": {
+                "baseScore": 5.3,
+                "exploitabilityScore": 3.9,
+                "impactScore": 1.4
+              },
+              "vendorMetadata": {}
+            },
+            {
+              "source": "security-advisories@github.com",
+              "type": "Secondary",
+              "version": "4.0",
+              "vector": "CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X",
+              "metrics": {
+                "baseScore": 6.3
+              },
+              "vendorMetadata": {}
+            }
+          ]
+        }
+      ],
+      "matchDetails": [
+        {
+          "type": "exact-direct-match",
+          "matcher": "javascript-matcher",
+          "searchedBy": {
+            "language": "javascript",
+            "namespace": "github:language:javascript",
+            "package": {
+              "name": "node-forge",
+              "version": "1.3.1"
+            }
+          },
+          "found": {
+            "versionConstraint": "<1.3.2 (unknown)",
+            "vulnerabilityID": "GHSA-65ch-62r8-g69g"
+          }
+        }
+      ],
+      "artifact": {
+        "id": "8f6c8524f69a351b",
+        "name": "node-forge",
+        "version": "1.3.1",
+        "type": "npm",
+        "locations": [
+          {
+            "path": "/reading_list_frontend/package-lock.json"
+          }
+        ],
+        "language": "javascript",
+        "licenses": [],
+        "cpes": [
+          "cpe:2.3:a:node-forge:node-forge:1.3.1:*:*:*:*:*:*:*",
+          "cpe:2.3:a:node-forge:node_forge:1.3.1:*:*:*:*:*:*:*",
+          "cpe:2.3:a:node_forge:node-forge:1.3.1:*:*:*:*:*:*:*",
+          "cpe:2.3:a:node_forge:node_forge:1.3.1:*:*:*:*:*:*:*",
+          "cpe:2.3:a:node:node-forge:1.3.1:*:*:*:*:*:*:*",
+          "cpe:2.3:a:node:node_forge:1.3.1:*:*:*:*:*:*:*"
+        ],
+        "purl": "pkg:npm/node-forge@1.3.1",
+        "upstreams": []
+      }
+    },
+    {
+      "vulnerability": {
+        "id": "GHSA-rp65-9cf3-cjxr",
+        "dataSource": "https://github.com/advisories/GHSA-rp65-9cf3-cjxr",
+        "namespace": "github:language:javascript",
+        "severity": "High",
+        "urls": [
+          "https://github.com/advisories/GHSA-rp65-9cf3-cjxr"
+        ],
+        "description": "Inefficient Regular Expression Complexity in nth-check",
+        "cvss": [
+          {
+            "version": "3.1",
+            "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+            "metrics": {
+              "baseScore": 7.5,
+              "exploitabilityScore": 3.9,
+              "impactScore": 3.6
+            },
+            "vendorMetadata": {
+              "base_severity": "High",
+              "status": "N/A"
+            }
+          }
+        ],
+        "fix": {
+          "versions": [
+            "2.0.1"
+          ],
+          "state": "fixed"
+        },
+        "advisories": []
+      },
+      "relatedVulnerabilities": [
+        {
+          "id": "CVE-2021-3803",
+          "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2021-3803",
+          "namespace": "nvd:cpe",
+          "severity": "High",
+          "urls": [
+            "https://github.com/fb55/nth-check/commit/9894c1d2010870c351f66c6f6efcf656e26bb726",
+            "https://huntr.dev/bounties/8cf8cc06-d2cf-4b4e-b42c-99fafb0b04d0",
+            "https://lists.debian.org/debian-lts-announce/2023/05/msg00023.html",
+            "https://github.com/fb55/nth-check/commit/9894c1d2010870c351f66c6f6efcf656e26bb726",
+            "https://huntr.dev/bounties/8cf8cc06-d2cf-4b4e-b42c-99fafb0b04d0",
+            "https://lists.debian.org/debian-lts-announce/2023/05/msg00023.html"
+          ],
+          "description": "nth-check is vulnerable to Inefficient Regular Expression Complexity",
+          "cvss": [
+            {
+              "source": "nvd@nist.gov",
+              "type": "Primary",
+              "version": "2.0",
+              "vector": "AV:N/AC:L/Au:N/C:N/I:N/A:P",
+              "metrics": {
+                "baseScore": 5,
+                "exploitabilityScore": 10,
+                "impactScore": 2.9
+              },
+              "vendorMetadata": {}
+            },
+            {
+              "source": "security@huntr.dev",
+              "type": "Secondary",
+              "version": "3.0",
+              "vector": "CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "metrics": {
+                "baseScore": 7.5,
+                "exploitabilityScore": 3.9,
+                "impactScore": 3.6
+              },
+              "vendorMetadata": {}
+            },
+            {
+              "source": "nvd@nist.gov",
+              "type": "Primary",
+              "version": "3.1",
+              "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "metrics": {
+                "baseScore": 7.5,
+                "exploitabilityScore": 3.9,
+                "impactScore": 3.6
+              },
+              "vendorMetadata": {}
+            }
+          ]
+        }
+      ],
+      "matchDetails": [
+        {
+          "type": "exact-direct-match",
+          "matcher": "javascript-matcher",
+          "searchedBy": {
+            "language": "javascript",
+            "namespace": "github:language:javascript",
+            "package": {
+              "name": "nth-check",
+              "version": "1.0.2"
+            }
+          },
+          "found": {
+            "versionConstraint": "<2.0.1 (unknown)",
+            "vulnerabilityID": "GHSA-rp65-9cf3-cjxr"
+          }
+        }
+      ],
+      "artifact": {
+        "id": "7dd5525f006da262",
+        "name": "nth-check",
+        "version": "1.0.2",
+        "type": "npm",
+        "locations": [
+          {
+            "path": "/reading_list_frontend/package-lock.json"
+          }
+        ],
+        "language": "javascript",
+        "licenses": [
+          "BSD-2-Clause"
+        ],
+        "cpes": [
+          "cpe:2.3:a:nth-check:nth-check:1.0.2:*:*:*:*:*:*:*",
+          "cpe:2.3:a:nth-check:nth_check:1.0.2:*:*:*:*:*:*:*",
+          "cpe:2.3:a:nth_check:nth-check:1.0.2:*:*:*:*:*:*:*",
+          "cpe:2.3:a:nth_check:nth_check:1.0.2:*:*:*:*:*:*:*",
+          "cpe:2.3:a:nth:nth-check:1.0.2:*:*:*:*:*:*:*",
+          "cpe:2.3:a:nth:nth_check:1.0.2:*:*:*:*:*:*:*"
+        ],
+        "purl": "pkg:npm/nth-check@1.0.2",
         "upstreams": []
       }
     },
@@ -649,12 +1183,12 @@
       "vex-add": []
     },
     "db": {
-      "built": "2025-11-24T00:27:54Z",
+      "built": "2025-12-09T00:25:52Z",
       "schemaVersion": 5,
       "location": "/.cache/grype/db/5",
-      "checksum": "sha256:d915d694dda30f89a5fafaff9cfa6ca2a25248f8ca070542bd3690f96606ee1c",
+      "checksum": "sha256:7e229039ef14f20bfce7e491ead12c2ae7926a3583f7b8d18bb44bea5756b4c7",
       "error": null
     },
-    "timestamp": "2025-11-24T19:19:20.461022146Z"
+    "timestamp": "2025-12-09T19:13:29.29933216Z"
   }
 }
