@@ -78,8 +78,14 @@ jobs:
             exit 1
           fi
 
-          # Получаем имя сети из контейнера (обычно это backend сеть)
-          NETWORK_NAME=$(docker inspect $APP_CONTAINER --format='{{range $k, $v := .NetworkSettings.Networks}}{{$k}}{{end}}' | head -1)
+          # Получаем имя сети из контейнера - выбираем backend сеть
+          # Контейнер подключён к нескольким сетям (backend и frontend), нам нужна backend
+          NETWORK_NAME=$(docker inspect $APP_CONTAINER --format='{{range $k, $v := .NetworkSettings.Networks}}{{$k}}{{"\n"}}{{end}}' | grep backend | head -1)
+
+          # Если не нашли backend, берём первую доступную сеть
+          if [ -z "$NETWORK_NAME" ]; then
+            NETWORK_NAME=$(docker inspect $APP_CONTAINER --format='{{range $k, $v := .NetworkSettings.Networks}}{{$k}}{{"\n"}}{{end}}' | head -1)
+          fi
 
           if [ -z "$NETWORK_NAME" ]; then
             echo "ERROR: Network name not found!"
