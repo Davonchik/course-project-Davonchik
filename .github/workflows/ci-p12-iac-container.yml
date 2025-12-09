@@ -58,7 +58,7 @@ jobs:
         run: |
           docker run --rm -i -v $PWD:/work \
             hadolint/hadolint:latest \
-            hadolint -f json /work/Dockerfile > EVIDENCE/P12/hadolint_report.json || true
+            hadolint -f json -c /work/security/hadolint.yaml /work/Dockerfile > EVIDENCE/P12/hadolint_report.json || true
 
           echo "=== Hadolint Report Summary ==="
           if [ -s EVIDENCE/P12/hadolint_report.json ]; then
@@ -73,6 +73,7 @@ jobs:
           docker run --rm -v $PWD:/work bridgecrew/checkov:latest \
             --directory /work \
             --framework kubernetes dockerfile docker_compose \
+            --config-file /work/security/checkov.yaml \
             --output json \
             --output-file /work/EVIDENCE/P12/checkov_report.json \
             --repo-id course-project \
