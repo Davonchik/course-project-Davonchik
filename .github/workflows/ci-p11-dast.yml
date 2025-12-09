@@ -68,19 +68,38 @@ jobs:
           curl -s http://localhost:8000/health | grep -q "healthy"
           echo "✓ Health check passed"
 
+      - name: Get docker-compose network name
+        id: network
+        run: |
+          # Получаем имя сети из docker-compose
+          APP_CONTAINER=$(docker compose ps -q app)
+          NETWORK_ID=$(docker inspect $APP_CONTAINER --format='{{range $k, $v := .NetworkSettings.Networks}}{{$k}}{{end}}' | head -1)
+          NETWORK_NAME=$(docker network inspect $NETWORK_ID --format='{{.Name}}' 2>/dev/null || echo "")
+          echo "network_name=$NETWORK_NAME" >> $GITHUB_OUTPUT
+          echo "Found network: $NETWORK_NAME"
+
       - name: ZAP Baseline
         run: |
-          # Используем host.docker.internal для доступа к localhost:8000 из контейнера ZAP
-          # В GitHub Actions это работает через --add-host=host.docker.internal:host-gateway
+          # Используем имя сети docker-compose для подключения ZAP к приложению
+          # Обращаемся к сервису по имени 'app' из docker-compose
+          # Используем образ из секдоков курса - он содержит zap-baseline.py
+          # Если недоступен, пробуем альтернативные варианты
           docker run --rm \
-            --add-host=host.docker.internal:host-gateway \
+            --network ${{ steps.network.outputs.network_name }} \
             -v $PWD:/zap/wrk/:rw \
-            owasp/zap2docker-stable \
+            docker.io/owasp/zap2docker-stable:latest \
             zap-baseline.py \
-              -t http://host.docker.internal:8000 \
+              -t http://app:8000 \
               -r /zap/wrk/zap_baseline.html \
               -J /zap/wrk/zap_baseline.json \
-              -d || true
+              -d || {
+                echo "Trying alternative: ghcr.io/zaproxy/zaproxy:stable"
+                docker run --rm \
+                  --network ${{ steps.network.outputs.network_name }} \
+                  -v $PWD:/zap/wrk/:rw \
+                  ghcr.io/zaproxy/zaproxy:stable \
+                  zap.sh -cmd -script /zap/wrk/zap_baseline.py -t http://app:8000 -r /zap/wrk/zap_baseline.html -J /zap/wrk/zap_baseline.json -d || true
+              }
 
           # Отчёты создаются в /zap/wrk внутри контейнера, который маппится на $PWD
           # Проверяем и перемещаем их в EVIDENCE/P11
