@@ -102,24 +102,28 @@ jobs:
 
           # Используем имя сети docker-compose для подключения ZAP к приложению
           # Обращаемся к сервису по имени 'app' из docker-compose
-          # Используем образ из секдоков курса - он содержит zap-baseline.py
-          # Если недоступен, пробуем альтернативные варианты
+          # Используем официальный образ ZAP с опциями -quickurl и -quickout для baseline scan
+          # Запускаем два сканирования для получения HTML и JSON отчётов
+          echo "Running ZAP baseline scan (HTML report)..."
           docker run --rm \
             --network "$NETWORK_NAME" \
             -v "$PWD:/zap/wrk/:rw" \
-            docker.io/owasp/zap2docker-stable:latest \
-            zap-baseline.py \
-              -t http://app:8000 \
-              -r /zap/wrk/zap_baseline.html \
-              -J /zap/wrk/zap_baseline.json \
-              -d || {
-                echo "Trying alternative: ghcr.io/zaproxy/zaproxy:stable"
-                docker run --rm \
-                  --network "$NETWORK_NAME" \
-                  -v "$PWD:/zap/wrk/:rw" \
-                  ghcr.io/zaproxy/zaproxy:stable \
-                  zap.sh -cmd -script /zap/wrk/zap_baseline.py -t http://app:8000 -r /zap/wrk/zap_baseline.html -J /zap/wrk/zap_baseline.json -d || true
-              }
+            ghcr.io/zaproxy/zaproxy:stable \
+            zap.sh -cmd -quickurl http://app:8000 \
+            -quickout /zap/wrk/zap_baseline.html \
+            -quickprogress || true
+
+          echo "Running ZAP baseline scan (JSON report)..."
+          docker run --rm \
+            --network "$NETWORK_NAME" \
+            -v "$PWD:/zap/wrk/:rw" \
+            ghcr.io/zaproxy/zaproxy:stable \
+            zap.sh -cmd -quickurl http://app:8000 \
+            -quickout /zap/wrk/zap_baseline.json \
+            -quickprogress || true
+
+          # Проверяем, что файлы созданы
+          ls -la zap_baseline.* || echo "Reports not found in current directory"
 
           # Отчёты создаются в /zap/wrk внутри контейнера, который маппится на $PWD
           # Проверяем и перемещаем их в EVIDENCE/P11
