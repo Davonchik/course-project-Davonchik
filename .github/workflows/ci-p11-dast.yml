@@ -70,14 +70,30 @@ jobs:
 
       - name: ZAP Baseline
         run: |
-          docker run --rm --network host -v $PWD:/zap/wrk owasp/zap2docker-stable \
+          # Используем host.docker.internal для доступа к localhost:8000 из контейнера ZAP
+          # В GitHub Actions это работает через --add-host=host.docker.internal:host-gateway
+          docker run --rm \
+            --add-host=host.docker.internal:host-gateway \
+            -v $PWD:/zap/wrk/:rw \
+            owasp/zap2docker-stable \
             zap-baseline.py \
-              -t http://localhost:8000 \
-              -r zap_baseline.html \
-              -J zap_baseline.json \
+              -t http://host.docker.internal:8000 \
+              -r /zap/wrk/zap_baseline.html \
+              -J /zap/wrk/zap_baseline.json \
               -d || true
-          mv zap_baseline.* EVIDENCE/P11/ || true
-          echo "✓ ZAP baseline scan completed"
+
+          # Отчёты создаются в /zap/wrk внутри контейнера, который маппится на $PWD
+          # Проверяем и перемещаем их в EVIDENCE/P11
+          if [ -f zap_baseline.html ] && [ -f zap_baseline.json ]; then
+            mv zap_baseline.html zap_baseline.json EVIDENCE/P11/
+            echo "✓ ZAP baseline scan completed - reports saved to EVIDENCE/P11/"
+            ls -lh EVIDENCE/P11/zap_baseline.*
+          else
+            echo "⚠️ ERROR: ZAP reports not found!"
+            echo "Current directory contents:"
+            ls -la | grep -E "(zap|EVIDENCE)" || true
+            exit 1
+          fi
 
       - name: Install jq for JSON parsing
         run: |
