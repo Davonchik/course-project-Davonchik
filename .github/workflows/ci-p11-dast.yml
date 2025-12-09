@@ -103,27 +103,43 @@ jobs:
           # Используем имя сети docker-compose для подключения ZAP к приложению
           # Обращаемся к сервису по имени 'app' из docker-compose
           # Используем официальный образ ZAP с опциями -quickurl и -quickout для baseline scan
+
+          # Создаём директорию для отчётов с полными правами, чтобы контейнер мог писать в неё
+          mkdir -p zap-reports
+          chmod 777 zap-reports
+
           # Запускаем два сканирования для получения HTML и JSON отчётов
+          # Используем -u 0 (root) чтобы избежать проблем с правами доступа к volume
+          # Используем /docs как стартовую точку, чтобы избежать 404 на корне
+
           echo "Running ZAP baseline scan (HTML report)..."
           docker run --rm \
+            --user 0 \
             --network "$NETWORK_NAME" \
-            -v "$PWD:/zap/wrk/:rw" \
+            -v "$PWD/zap-reports:/zap/wrk/:rw" \
             ghcr.io/zaproxy/zaproxy:stable \
-            zap.sh -cmd -quickurl http://app:8000 \
+            zap.sh -cmd -quickurl http://app:8000/docs \
             -quickout /zap/wrk/zap_baseline.html \
             -quickprogress || true
 
           echo "Running ZAP baseline scan (JSON report)..."
           docker run --rm \
+            --user 0 \
             --network "$NETWORK_NAME" \
-            -v "$PWD:/zap/wrk/:rw" \
+            -v "$PWD/zap-reports:/zap/wrk/:rw" \
             ghcr.io/zaproxy/zaproxy:stable \
-            zap.sh -cmd -quickurl http://app:8000 \
+            zap.sh -cmd -quickurl http://app:8000/docs \
             -quickout /zap/wrk/zap_baseline.json \
             -quickprogress || true
 
-          # Проверяем, что файлы созданы
-          ls -la zap_baseline.* || echo "Reports not found in current directory"
+          # Проверяем, что файлы созданы и перемещаем их
+          if [ -f zap-reports/zap_baseline.html ] && [ -f zap-reports/zap_baseline.json ]; then
+            mv zap-reports/zap_baseline.html zap_baseline.html
+            mv zap-reports/zap_baseline.json zap_baseline.json
+          else
+            echo "Reports not found in zap-reports directory:"
+            ls -la zap-reports/
+          fi
 
           # Отчёты создаются в /zap/wrk внутри контейнера, который маппится на $PWD
           # Проверяем и перемещаем их в EVIDENCE/P11
