@@ -1,0 +1,10 @@
+# Hadolint configuration for P12
+# https://github.com/hadolint/hadolint
+
+ignored:
+  # DL3008: Pin versions in apt-get install
+  # Reason: Base python image manages system packages
+  - DL3008
+
+# You can add more rules to ignore if needed
+# Format: - DL<code>
