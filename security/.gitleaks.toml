@@ -1,0 +1,29 @@
+title = "course-project gitleaks config"
+
+[extend]
+# Используем встроенные правила по умолчанию
+useDefault = true
+
+[allowlist]
+description = "ignore non-sensitive patterns and test/dev defaults"
+
+# Игнорируем директории с артефактами и отчётами
+paths = [
+  '''EVIDENCE/''',
+  '''__pycache__/''',
+  '''node_modules/''',
+  '''.git/''',
+  '''reading_list_frontend/build/''',
+]
+
+# Игнорируем известные dev-секреты в config.py и CI workflows (это тестовые значения)
+regexes = [
+  '''JWT_SECRET.*=.*"dev-secret-change-me"''',
+  '''POSTGRES_PASSWORD.*=.*"postgres"''',
+  '''POSTGRES_USER.*=.*"postgres"''',
+  '''DATABASE_URL.*postgresql.*postgres:postgres''',
+  '''test-secret-key-for-ci-min-32-chars-long''',  # CI test secret
+]
+
+# Игнорируем тестовые данные в тестах
+commits = []
