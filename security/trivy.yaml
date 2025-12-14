@@ -1,0 +1,16 @@
+# Trivy configuration for P12
+# https://aquasecurity.github.io/trivy/
+
+scan:
+  scanners:
+    - vuln
+    - config
+  severity:
+    - CRITICAL
+    - HIGH
+    - MEDIUM
+
+format: "json"
+
+# Timeout for scanning
+timeout: "10m"
